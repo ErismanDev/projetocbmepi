@@ -1,0 +1,280 @@
+{% extends "base_dashboard.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('listar_alunos') }}">Alunos</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Novo Aluno</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white d-flex align-items-center">
+                    <i class="bi bi-person-plus-fill me-2 fs-4"></i>
+                    <h5 class="card-title mb-0">Novo Aluno</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row g-3">
+                            <!-- Foto do Aluno -->
+                            <div class="col-12 text-center mb-4">
+                                <div class="position-relative d-inline-block">
+                                    <img id="preview" src="{{ url_for('static', filename='img/default_profile.png') }}" 
+                                         class="rounded-circle border shadow-sm" 
+                                         style="width: 150px; height: 150px; object-fit: cover;">
+                                    <label for="foto" class="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle p-2 cursor-pointer" 
+                                           style="cursor: pointer;">
+                                        <i class="bi bi-camera-fill"></i>
+                                    </label>
+                                    {{ form.foto(class="d-none", id="foto", onchange="previewImage(this)") }}
+                                </div>
+                            </div>
+
+                            <!-- Nome Completo -->
+                            <div class="col-md-12">
+                                <div class="form-floating">
+                                    {{ form.nome_completo(class="form-control", placeholder="Nome Completo") }}
+                                    <label for="nome_completo">Nome Completo</label>
+                                    {% if form.nome_completo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.nome_completo.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Data de Nascimento -->
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.data_nascimento(class="form-control", type="date", placeholder="Data de Nascimento") }}
+                                    <label for="data_nascimento">Data de Nascimento</label>
+                                    {% if form.data_nascimento.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.data_nascimento.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Sexo -->
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.sexo(class="form-select", placeholder="Sexo") }}
+                                    <label for="sexo">Sexo</label>
+                                    {% if form.sexo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.sexo.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- RG -->
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.rg(class="form-control", placeholder="RG") }}
+                                    <label for="rg">RG</label>
+                                    {% if form.rg.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.rg.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- CPF -->
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.cpf(class="form-control", placeholder="CPF") }}
+                                    <label for="cpf">CPF</label>
+                                    {% if form.cpf.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.cpf.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Endereço -->
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    {{ form.endereco(class="form-control", placeholder="Endereço") }}
+                                    <label for="endereco">Endereço</label>
+                                    {% if form.endereco.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.endereco.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Telefone -->
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.telefone(class="form-control", placeholder="Telefone") }}
+                                    <label for="telefone">Telefone</label>
+                                    {% if form.telefone.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.telefone.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.email(class="form-control", type="email", placeholder="Email") }}
+                                    <label for="email">Email</label>
+                                    {% if form.email.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.email.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Nome do Responsável -->
+                            <div class="col-md-12">
+                                <div class="form-floating">
+                                    {{ form.nome_responsavel(class="form-control", placeholder="Nome do Responsável") }}
+                                    <label for="nome_responsavel">Nome do Responsável</label>
+                                    {% if form.nome_responsavel.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.nome_responsavel.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Telefone do Responsável -->
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.telefone_responsavel(class="form-control", placeholder="Telefone do Responsável") }}
+                                    <label for="telefone_responsavel">Telefone do Responsável</label>
+                                    {% if form.telefone_responsavel.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.telefone_responsavel.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Email do Responsável -->
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.email_responsavel(class="form-control", type="email", placeholder="Email do Responsável") }}
+                                    <label for="email_responsavel">Email do Responsável</label>
+                                    {% if form.email_responsavel.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.email_responsavel.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Status -->
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.status(class="form-select", placeholder="Status") }}
+                                    <label for="status">Status</label>
+                                    {% if form.status.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.status.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Observações -->
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    {{ form.observacoes(class="form-control", style="height: 100px", placeholder="Observações") }}
+                                    <label for="observacoes">Observações</label>
+                                    {% if form.observacoes.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.observacoes.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a href="{{ url_for('listar_alunos') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-2"></i>Salvar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('preview').src = e.target.result;
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// Validação do formulário
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+</script>
+{% endblock %}
+
+{% endblock %} 

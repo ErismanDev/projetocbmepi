@@ -1,0 +1,219 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Cadastrar Instrutor{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Cadastrar Instrutor</h1>
+        <a href="{{ url_for('listar_instrutores') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+            </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <form action="{{ url_for('cadastrar_instrutor') }}" method="POST" enctype="multipart/form-data">
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">Dados Pessoais</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group mb-2">
+                                    <label for="nome">Nome Completo *</label>
+                                    <input type="text" class="form-control" id="nome" name="nome" required>
+                                </div>
+                                <div class="form-group mb-2">
+                                    <label for="email">Email *</label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                                <div class="form-group mb-2">
+                                    <label for="senha">Senha *</label>
+                                    <input type="password" class="form-control" id="senha" name="senha" required>
+                                </div>
+                                <div class="form-group mb-2">
+                                    <label for="confirmar_senha">Confirmar Senha *</label>
+                                    <input type="password" class="form-control" id="confirmar_senha" name="confirmar_senha" required>
+                                </div>
+                                <div class="form-group mb-2">
+                                    <label for="cpf">CPF *</label>
+                                    <input type="text" class="form-control cpf" id="cpf" name="cpf" required>
+                                </div>
+                                <div class="form-group mb-2">
+                                    <label for="rg">RG *</label>
+                                    <input type="text" class="form-control" id="rg" name="rg" required>
+                                </div>
+                                <div class="form-group mb-2">
+                                    <label for="data_nascimento">Data de Nascimento *</label>
+                                    <input type="date" class="form-control" id="data_nascimento" name="data_nascimento" required>
+                                </div>
+                                <div class="form-group mb-2">
+                                    <label for="telefone">Telefone *</label>
+                                    <input type="text" class="form-control telefone" id="telefone" name="telefone" required>
+                                </div>
+                                <div class="form-group mb-2">
+                                    <label for="telefone_emergencia">Telefone de Emergência</label>
+                                    <input type="text" class="form-control telefone" id="telefone_emergencia" name="telefone_emergencia">
+                                </div>
+                                <div class="form-group mb-2">
+                                    <label for="foto">Foto</label>
+                                    <input type="file" class="form-control-file" id="foto" name="foto" accept="image/*">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0">Dados Profissionais</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group mb-2">
+                                    <label for="formacao">Formação</label>
+                                    <input type="text" class="form-control" id="formacao" name="formacao">
+                                </div>
+                                <div class="form-group mb-2">
+                                    <label for="especializacao">Especialização</label>
+                                    <input type="text" class="form-control" id="especializacao" name="especializacao">
+                                </div>
+                                <div class="form-group mb-2">
+                                    <label for="data_admissao">Data de Admissão</label>
+                                    <input type="date" class="form-control" id="data_admissao" name="data_admissao">
+                                </div>
+                                <div class="form-group mb-2">
+                                    <label for="status">Status *</label>
+                                    <select class="form-control" id="status" name="status" required>
+                                        <option value="ativo">Ativo</option>
+                                        <option value="inativo">Inativo</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0">Endereço</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group mb-2">
+                                    <label for="cep">CEP</label>
+                                    <input type="text" class="form-control cep" id="cep" name="cep">
+                                </div>
+                                <div class="form-group mb-2">
+                                    <label for="logradouro">Logradouro</label>
+                                    <input type="text" class="form-control" id="logradouro" name="logradouro">
+                                </div>
+                                <div class="form-group mb-2">
+                                    <label for="numero">Número</label>
+                                    <input type="text" class="form-control" id="numero" name="numero">
+                                </div>
+                                <div class="form-group mb-2">
+                                    <label for="complemento">Complemento</label>
+                                    <input type="text" class="form-control" id="complemento" name="complemento">
+                                </div>
+                                <div class="form-group mb-2">
+                                    <label for="bairro">Bairro</label>
+                                    <input type="text" class="form-control" id="bairro" name="bairro">
+                                </div>
+                                <div class="form-group mb-2">
+                                    <label for="cidade">Cidade</label>
+                                    <input type="text" class="form-control" id="cidade" name="cidade">
+                                </div>
+                                <div class="form-group mb-2">
+                                    <label for="estado">Estado</label>
+                                    <select class="form-control" id="estado" name="estado">
+                                        <option value="">Selecione...</option>
+                                        <option value="AC">Acre</option>
+                                        <option value="AL">Alagoas</option>
+                                        <option value="AP">Amapá</option>
+                                        <option value="AM">Amazonas</option>
+                                        <option value="BA">Bahia</option>
+                                        <option value="CE">Ceará</option>
+                                        <option value="DF">Distrito Federal</option>
+                                        <option value="ES">Espírito Santo</option>
+                                        <option value="GO">Goiás</option>
+                                        <option value="MA">Maranhão</option>
+                                        <option value="MT">Mato Grosso</option>
+                                        <option value="MS">Mato Grosso do Sul</option>
+                                        <option value="MG">Minas Gerais</option>
+                                        <option value="PA">Pará</option>
+                                        <option value="PB">Paraíba</option>
+                                        <option value="PR">Paraná</option>
+                                        <option value="PE">Pernambuco</option>
+                                        <option value="PI">Piauí</option>
+                                        <option value="RJ">Rio de Janeiro</option>
+                                        <option value="RN">Rio Grande do Norte</option>
+                                        <option value="RS">Rio Grande do Sul</option>
+                                        <option value="RO">Rondônia</option>
+                                        <option value="RR">Roraima</option>
+                                        <option value="SC">Santa Catarina</option>
+                                        <option value="SP">São Paulo</option>
+                                        <option value="SE">Sergipe</option>
+                                        <option value="TO">Tocantins</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary px-5 py-2">
+                        <i class="fas fa-save"></i> Cadastrar Instrutor
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        // Máscaras para os campos
+        $('.cpf').mask('000.000.000-00');
+        $('.telefone').mask('(00) 00000-0000');
+        $('.cep').mask('00000-000');
+
+        // Validação de senha
+        $('#confirmar_senha').on('input', function() {
+            if ($(this).val() !== $('#senha').val()) {
+                $(this).addClass('is-invalid');
+                } else {
+                $(this).removeClass('is-invalid');
+            }
+    });
+
+        // Busca de CEP
+        $('#cep').on('blur', function() {
+            var cep = $(this).val().replace(/\D/g, '');
+            if (cep.length === 8) {
+                $.get(`https://viacep.com.br/ws/${cep}/json/`, function(data) {
+                    if (!data.erro) {
+                        $('#logradouro').val(data.logradouro);
+                        $('#bairro').val(data.bairro);
+                        $('#cidade').val(data.localidade);
+                        $('#estado').val(data.uf);
+                    }
+                });
+        }
+    });
+});
+</script>
+{% endblock %} 

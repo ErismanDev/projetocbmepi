@@ -1,0 +1,62 @@
+{% extends "base_dashboard.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Menu de Navegação -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('listar_matriculas') }}">Matrículas</a></li>
+            <li class="breadcrumb-item active">Exportar Matrículas</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-file-export me-2"></i>Exportar Matrículas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-4">
+                            <label for="formato" class="form-label">Formato do Arquivo</label>
+                            <select class="form-select" id="formato" name="formato" required>
+                                <option value="csv">CSV</option>
+                                <option value="excel">Excel</option>
+                                <option value="pdf">PDF</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="matricula_id" class="form-label">Matrícula Específica (opcional)</label>
+                            <select class="form-select" id="matricula_id" name="matricula_id">
+                                <option value="">Todas as matrículas</option>
+                                {% for matricula in matriculas %}
+                                <option value="{{ matricula.id }}">
+                                    {{ matricula.aluno.nome }} - {{ matricula.turma.nome }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">
+                                Se nenhuma matrícula for selecionada, todas as matrículas serão exportadas.
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('listar_matriculas') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Voltar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-download me-2"></i>Exportar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,194 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Alunos da Turma - {{ turma.nome }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('listar_turmas') }}">Turmas</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('detalhes_turma', turma_id=turma.id) }}">{{ turma.nome }}</a></li>
+                    <li class="breadcrumb-item active">Alunos</li>
+                </ol>
+            </nav>
+            <h2 class="h3 mb-0">Gerenciar Alunos</h2>
+            <p class="text-muted">Selecione os alunos para esta turma</p>
+        </div>
+    </div>
+
+    <!-- Alertas -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form action="{{ url_for('gerenciar_alunos_turma', turma_id=turma.id) }}" method="POST">
+                        <!-- Campo de busca -->
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="searchAlunos" 
+                                       placeholder="Buscar alunos..."
+                                       onkeyup="filterAlunos()">
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table" id="tabelaAlunos">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 50px;">
+                                            <div class="form-check">
+                                                <input type="checkbox" 
+                                                       class="form-check-input" 
+                                                       id="selectAll"
+                                                       onchange="toggleAllAlunos()">
+                                            </div>
+                                        </th>
+                                        <th>Nome</th>
+                                        <th>Idade</th>
+                                        <th>Contato</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for aluno in todos_alunos %}
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input type="checkbox" 
+                                                       class="form-check-input aluno-checkbox" 
+                                                       name="alunos" 
+                                                       value="{{ aluno.id }}"
+                                                       id="aluno_{{ aluno.id }}"
+                                                       {% if aluno in turma.alunos %}checked{% endif %}>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <label for="aluno_{{ aluno.id }}" class="form-check-label">
+                                                {{ aluno.nome }}
+                                            </label>
+                                        </td>
+                                        <td>{{ aluno.idade }} anos</td>
+                                        <td>{{ aluno.contato }}</td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="4" class="text-center">
+                                            Nenhum aluno ativo disponível.
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <div>
+                                <span class="text-muted" id="selectedCount">0 alunos selecionados</span>
+                            </div>
+                            <div>
+                                <a href="{{ url_for('detalhes_turma', turma_id=turma.id) }}" class="btn btn-secondary me-2">Cancelar</a>
+                                <button type="submit" class="btn btn-danger">Salvar Alterações</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Informações da Turma</h5>
+                    <p class="card-text">
+                        <strong>Curso:</strong><br>
+                        {{ turma.curso.nome }}
+                    </p>
+                    <p class="card-text">
+                        <strong>Período:</strong><br>
+                        {{ turma.data_inicio.strftime('%d/%m/%Y') }} a {{ turma.data_fim.strftime('%d/%m/%Y') }}
+                    </p>
+                    <p class="card-text">
+                        <strong>Instrutor Principal:</strong><br>
+                        {{ turma.instrutor.nome }}
+                    </p>
+                    <p class="card-text mb-0">
+                        <strong>Status:</strong><br>
+                        <span class="badge {% if turma.status == 'ativa' %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ turma.status | title }}
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+function filterAlunos() {
+    var input = document.getElementById('searchAlunos');
+    var filter = input.value.toLowerCase();
+    var table = document.getElementById('tabelaAlunos');
+    var tr = table.getElementsByTagName('tr');
+
+    for (var i = 1; i < tr.length; i++) {
+        var td = tr[i].getElementsByTagName('td')[1]; // Nome do aluno
+        if (td) {
+            var txtValue = td.textContent || td.innerText;
+            if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                tr[i].style.display = '';
+            } else {
+                tr[i].style.display = 'none';
+            }
+        }
+    }
+}
+
+function toggleAllAlunos() {
+    var checkboxes = document.getElementsByClassName('aluno-checkbox');
+    var selectAll = document.getElementById('selectAll');
+    
+    for (var checkbox of checkboxes) {
+        checkbox.checked = selectAll.checked;
+    }
+    updateSelectedCount();
+}
+
+function updateSelectedCount() {
+    var checkboxes = document.getElementsByClassName('aluno-checkbox');
+    var count = 0;
+    for (var checkbox of checkboxes) {
+        if (checkbox.checked) count++;
+    }
+    document.getElementById('selectedCount').textContent = count + ' alunos selecionados';
+}
+
+// Adiciona listener para todos os checkboxes
+document.addEventListener('DOMContentLoaded', function() {
+    var checkboxes = document.getElementsByClassName('aluno-checkbox');
+    for (var checkbox of checkboxes) {
+        checkbox.addEventListener('change', updateSelectedCount);
+    }
+    updateSelectedCount();
+});
+</script>
+{% endblock %}
+{% endblock %} 

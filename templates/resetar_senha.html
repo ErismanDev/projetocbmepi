@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Resetar Senha{% endblock %}
+
+{% block main_content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title text-center mb-4">Resetar Senha</h2>
+                <p class="text-center mb-4">Digite seu email para receber as instruções de recuperação de senha.</p>
+                <form method="POST" action="{{ url_for('resetar_senha') }}">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-danger">Enviar Instruções</button>
+                        <a href="{{ url_for('login') }}" class="btn btn-secondary">Voltar para Login</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,273 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Detalhes da Turma - {{ turma.nome }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('listar_turmas') }}">Turmas</a></li>
+                    <li class="breadcrumb-item active">{{ turma.nome }}</li>
+                </ol>
+            </nav>
+            <h2 class="h3 mb-0">{{ turma.nome }}</h2>
+            <p class="text-muted">{{ turma.curso.nome }}</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editarTurma">
+                <i class="bi bi-pencil"></i> Editar Turma
+            </button>
+            <a href="{{ url_for('listar_aulas', turma_id=turma.id) }}" class="btn btn-danger">
+                <i class="bi bi-calendar2-week"></i> Gerenciar Aulas
+            </a>
+        </div>
+    </div>
+
+    <!-- Alertas -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="row">
+        <!-- Informações Principais -->
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Informações da Turma</h5>
+                    
+                    <div class="mb-3">
+                        <p class="mb-1"><strong>Curso:</strong></p>
+                        <p>{{ turma.curso.nome }}</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <p class="mb-1"><strong>Período:</strong></p>
+                        <p>{{ turma.data_inicio.strftime('%d/%m/%Y') }} a {{ turma.data_fim.strftime('%d/%m/%Y') }}</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <p class="mb-1"><strong>Instrutor Principal:</strong></p>
+                        <p>{{ turma.instrutor.nome }}</p>
+                    </div>
+
+                    <div>
+                        <p class="mb-1"><strong>Status:</strong></p>
+                        <p class="mb-0">
+                            <span class="badge {% if turma.status == 'ativa' %}bg-success{% else %}bg-secondary{% endif %}">
+                                {{ turma.status | title }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estatísticas -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Estatísticas</h5>
+                    
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="flex-shrink-0">
+                            <div class="rounded-circle bg-primary bg-opacity-10 p-3">
+                                <i class="bi bi-people text-primary fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="mb-0">{{ turma.alunos|length }}</h6>
+                            <small class="text-muted">Alunos Matriculados</small>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="flex-shrink-0">
+                            <div class="rounded-circle bg-success bg-opacity-10 p-3">
+                                <i class="bi bi-book text-success fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="mb-0">{{ turma.disciplinas|length }}</h6>
+                            <small class="text-muted">Disciplinas</small>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="rounded-circle bg-info bg-opacity-10 p-3">
+                                <i class="bi bi-calendar2-check text-info fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="mb-0">{{ turma.aulas|length }}</h6>
+                            <small class="text-muted">Aulas Registradas</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Alunos -->
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">Alunos Matriculados</h5>
+                        <a href="{{ url_for('gerenciar_alunos_turma', turma_id=turma.id) }}" class="btn btn-sm btn-outline-primary">
+                            Gerenciar Alunos
+                        </a>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Idade</th>
+                                    <th>Contato</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for aluno in turma.alunos %}
+                                <tr>
+                                    <td>{{ aluno.nome }}</td>
+                                    <td>{{ aluno.idade }} anos</td>
+                                    <td>{{ aluno.contato }}</td>
+                                    <td>
+                                        <a href="{{ url_for('detalhes_aluno', aluno_id=aluno.id) }}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center">
+                                        Nenhum aluno matriculado nesta turma.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Disciplinas -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">Disciplinas</h5>
+                        <a href="{{ url_for('gerenciar_disciplinas_turma', turma_id=turma.id) }}" class="btn btn-sm btn-outline-primary">
+                            Gerenciar Disciplinas
+                        </a>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Disciplina</th>
+                                    <th>Carga Horária</th>
+                                    <th>Instrutor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for disciplina in turma.disciplinas %}
+                                <tr>
+                                    <td>{{ disciplina.nome }}</td>
+                                    <td>{{ disciplina.carga_horaria }}h</td>
+                                    <td>{{ disciplina.instrutor.nome if disciplina.instrutor else 'Não atribuído' }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center">
+                                        Nenhuma disciplina atribuída a esta turma.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Edição da Turma -->
+    <div class="modal fade" id="editarTurma" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Turma</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="{{ url_for('atualizar_turma', turma_id=turma.id) }}" method="POST">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Nome da Turma</label>
+                            <input type="text" class="form-control" name="nome" value="{{ turma.nome }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Instrutor Principal</label>
+                            <select class="form-select" name="instrutor_id" required>
+                                {% for instrutor in instrutores %}
+                                <option value="{{ instrutor.id }}" {% if instrutor.id == turma.instrutor_id %}selected{% endif %}>
+                                    {{ instrutor.nome }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Data de Início</label>
+                                    <input type="date" 
+                                           class="form-control" 
+                                           name="data_inicio" 
+                                           value="{{ turma.data_inicio.strftime('%Y-%m-%d') }}"
+                                           required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Data de Término</label>
+                                    <input type="date" 
+                                           class="form-control" 
+                                           name="data_fim" 
+                                           value="{{ turma.data_fim.strftime('%Y-%m-%d') }}"
+                                           required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status" required>
+                                <option value="ativa" {% if turma.status == 'ativa' %}selected{% endif %}>Ativa</option>
+                                <option value="concluída" {% if turma.status == 'concluída' %}selected{% endif %}>Concluída</option>
+                                <option value="cancelada" {% if turma.status == 'cancelada' %}selected{% endif %}>Cancelada</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

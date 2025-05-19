@@ -1,0 +1,100 @@
+{% extends "base_dashboard.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Novo Diário de Classe</h1>
+    {% if session.get('usuario_tipo') == 'admin' or session.get('usuario_tipo') == 'instrutor' %}
+    <form method="POST" action="{{ url_for('novo_diario') }}">
+        <div class="form-group mb-3">
+            <label for="turma_id">Turma</label>
+            <select class="form-control" id="turma_id" name="turma_id" required>
+                <option value="">Selecione uma turma</option>
+                {% for turma in turmas %}
+                <option value="{{ turma.id }}">{{ turma.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="disciplina_id">Disciplina</label>
+            <select class="form-control" id="disciplina_id" name="disciplina_id" required>
+                <option value="">Selecione uma disciplina</option>
+                {% for disciplina in disciplinas %}
+                <option value="{{ disciplina.id }}">{{ disciplina.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="data">Data</label>
+            <input type="date" class="form-control" id="data" name="data" required>
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="conteudo">Conteúdo</label>
+            <textarea class="form-control" id="conteudo" name="conteudo" rows="5" required></textarea>
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="observacoes">Observações</label>
+            <textarea class="form-control" id="observacoes" name="observacoes" rows="3"></textarea>
+        </div>
+        
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-save"></i> Salvar
+            </button>
+            <a href="{{ url_for('listar_diarios') }}" class="btn btn-secondary">
+                <i class="bi bi-x-circle"></i> Cancelar
+            </a>
+        </div>
+    </form>
+    {% else %}
+    <div class="alert alert-danger">
+        Você não tem permissão para acessar esta página.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Atualiza as disciplinas quando uma turma é selecionada
+    document.getElementById('turma_id').addEventListener('change', function() {
+        const turmaId = this.value;
+        const disciplinaSelect = document.getElementById('disciplina_id');
+        
+        // Limpa as opções atuais
+        disciplinaSelect.innerHTML = '<option value="">Selecione uma disciplina</option>';
+        
+        if (turmaId) {
+            // Busca as disciplinas da turma selecionada
+            fetch(`/turma/${turmaId}/disciplinas`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro ao buscar disciplinas');
+                }
+                return response.json();
+            })
+            .then(disciplinas => {
+                disciplinas.forEach(disciplina => {
+                    const option = document.createElement('option');
+                    option.value = disciplina.id;
+                    option.textContent = disciplina.nome;
+                    disciplinaSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao carregar disciplinas. Por favor, tente novamente.');
+            });
+        }
+    });
+</script>
+{% endblock %} 

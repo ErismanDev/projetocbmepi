@@ -1,0 +1,185 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Disciplinas - {{ curso.nome }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('listar_cursos') }}">Cursos</a></li>
+                    <li class="breadcrumb-item active">{{ curso.nome }}</li>
+                </ol>
+            </nav>
+            <h2 class="h3 mb-0">Disciplinas do Curso</h2>
+            <p class="text-muted">Gerenciamento de disciplinas de {{ curso.nome }}</p>
+        </div>
+        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#novaDisciplina">
+            <i class="bi bi-plus-circle"></i> Nova Disciplina
+        </button>
+    </div>
+
+    <!-- Alertas -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Lista de Disciplinas -->
+    <div class="row">
+        {% for disciplina in curso.disciplinas %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">{{ disciplina.nome }}</h5>
+                    <p class="card-text text-muted">
+                        <small><i class="bi bi-clock"></i> {{ disciplina.carga_horaria }}h</small>
+                    </p>
+                    
+                    <p class="card-text">{{ disciplina.descricao }}</p>
+                    
+                    {% if disciplina.instrutor %}
+                    <p class="card-text">
+                        <strong>Instrutor:</strong> {{ disciplina.instrutor.nome }}
+                    </p>
+                    {% endif %}
+
+                    <div class="d-flex justify-content-end gap-2 mt-3">
+                        <button class="btn btn-sm btn-outline-primary" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#editarDisciplina{{ disciplina.id }}">
+                            <i class="bi bi-pencil"></i> Editar
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger"
+                                data-bs-toggle="modal" 
+                                data-bs-target="#excluirDisciplina{{ disciplina.id }}">
+                            <i class="bi bi-trash"></i> Excluir
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Edição -->
+        <div class="modal fade" id="editarDisciplina{{ disciplina.id }}" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Disciplina</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form action="{{ url_for('atualizar_disciplina', disciplina_id=disciplina.id) }}" method="POST">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Nome da Disciplina</label>
+                                <input type="text" class="form-control" name="nome" value="{{ disciplina.nome }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Descrição</label>
+                                <textarea class="form-control" name="descricao" rows="3">{{ disciplina.descricao }}</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Carga Horária (horas)</label>
+                                <input type="number" class="form-control" name="carga_horaria" value="{{ disciplina.carga_horaria }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Instrutor</label>
+                                <select class="form-select" name="instrutor_id">
+                                    <option value="">Selecione um instrutor</option>
+                                    {% for instrutor in instrutores %}
+                                    <option value="{{ instrutor.id }}" {% if disciplina.instrutor_id == instrutor.id %}selected{% endif %}>
+                                        {{ instrutor.nome }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Exclusão -->
+        <div class="modal fade" id="excluirDisciplina{{ disciplina.id }}" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirmar Exclusão</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Tem certeza que deseja excluir a disciplina <strong>{{ disciplina.nome }}</strong>?</p>
+                        <p class="text-danger"><small>Esta ação não pode ser desfeita.</small></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <form action="{{ url_for('excluir_disciplina', disciplina_id=disciplina.id) }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-danger">Confirmar Exclusão</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                Nenhuma disciplina cadastrada para este curso.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Modal de Nova Disciplina -->
+    <div class="modal fade" id="novaDisciplina" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nova Disciplina</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="{{ url_for('nova_disciplina', curso_id=curso.id) }}" method="POST">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Nome da Disciplina</label>
+                            <input type="text" class="form-control" name="nome" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descrição</label>
+                            <textarea class="form-control" name="descricao" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Carga Horária (horas)</label>
+                            <input type="number" class="form-control" name="carga_horaria" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Instrutor</label>
+                            <select class="form-select" name="instrutor_id">
+                                <option value="">Selecione um instrutor</option>
+                                {% for instrutor in instrutores %}
+                                <option value="{{ instrutor.id }}">{{ instrutor.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger">Adicionar Disciplina</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

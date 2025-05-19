@@ -1,0 +1,270 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Gerenciar Disciplinas - {{ turma.nome }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('listar_turmas') }}">Turmas</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('detalhes_turma', turma_id=turma.id) }}">{{ turma.nome }}</a></li>
+                    <li class="breadcrumb-item active">Gerenciar Disciplinas</li>
+                </ol>
+            </nav>
+            <h2 class="h3 mb-0">Gerenciar Disciplinas</h2>
+            <p class="text-muted">{{ turma.nome }} - {{ turma.curso.nome }}</p>
+        </div>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#adicionarDisciplina">
+            <i class="bi bi-plus-lg"></i> Adicionar Disciplina
+        </button>
+    </div>
+
+    <!-- Alertas -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Lista de Disciplinas -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Disciplina</th>
+                            <th>Carga Horária</th>
+                            <th>Instrutor</th>
+                            <th>Status</th>
+                            <th class="text-end">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for disciplina in turma.disciplinas %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <div class="rounded-circle bg-primary bg-opacity-10 p-2">
+                                            <i class="bi bi-book text-primary"></i>
+                                        </div>
+                                    </div>
+                                    <div class="ms-3">
+                                        <h6 class="mb-0">{{ disciplina.nome }}</h6>
+                                        <small class="text-muted">{{ disciplina.descricao }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ disciplina.carga_horaria }}h</td>
+                            <td>
+                                {% if disciplina.instrutor %}
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <img src="{{ disciplina.instrutor.foto_url or url_for('static', filename='img/default_profile.png') }}" 
+                                             class="rounded-circle" 
+                                             width="32" 
+                                             height="32" 
+                                             alt="{{ disciplina.instrutor.nome }}">
+                                    </div>
+                                    <div class="ms-2">
+                                        {{ disciplina.instrutor.nome }}
+                                    </div>
+                                </div>
+                                {% else %}
+                                <span class="text-muted">Não atribuído</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge {% if disciplina.status == 'ativa' %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {{ disciplina.status | title }}
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group">
+                                    <button type="button" 
+                                            class="btn btn-sm btn-outline-primary"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#editarDisciplina{{ disciplina.id }}">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button type="button" 
+                                            class="btn btn-sm btn-outline-danger"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#removerDisciplina{{ disciplina.id }}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Modal de Edição -->
+                        <div class="modal fade" id="editarDisciplina{{ disciplina.id }}" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Editar Disciplina</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <form action="{{ url_for('atualizar_disciplina_turma', turma_id=turma.id, disciplina_id=disciplina.id) }}" method="POST">
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <label class="form-label">Nome da Disciplina</label>
+                                                <input type="text" 
+                                                       class="form-control" 
+                                                       name="nome" 
+                                                       value="{{ disciplina.nome }}" 
+                                                       required>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Descrição</label>
+                                                <textarea class="form-control" 
+                                                          name="descricao" 
+                                                          rows="3">{{ disciplina.descricao }}</textarea>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Carga Horária (horas)</label>
+                                                <input type="number" 
+                                                       class="form-control" 
+                                                       name="carga_horaria" 
+                                                       value="{{ disciplina.carga_horaria }}" 
+                                                       required>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Instrutor</label>
+                                                <select class="form-select" name="instrutor_id">
+                                                    <option value="">Selecione um instrutor</option>
+                                                    {% for instrutor in instrutores %}
+                                                    <option value="{{ instrutor.id }}" 
+                                                            {% if disciplina.instrutor_id == instrutor.id %}selected{% endif %}>
+                                                        {{ instrutor.nome }}
+                                                    </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Status</label>
+                                                <select class="form-select" name="status" required>
+                                                    <option value="ativa" {% if disciplina.status == 'ativa' %}selected{% endif %}>Ativa</option>
+                                                    <option value="concluída" {% if disciplina.status == 'concluída' %}selected{% endif %}>Concluída</option>
+                                                    <option value="cancelada" {% if disciplina.status == 'cancelada' %}selected{% endif %}>Cancelada</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal de Remoção -->
+                        <div class="modal fade" id="removerDisciplina{{ disciplina.id }}" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Remover Disciplina</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Tem certeza que deseja remover a disciplina <strong>{{ disciplina.nome }}</strong> desta turma?</p>
+                                        <p class="text-danger mb-0">Esta ação não pode ser desfeita.</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <form action="{{ url_for('remover_disciplina_turma', turma_id=turma.id, disciplina_id=disciplina.id) }}" 
+                                              method="POST" 
+                                              class="d-inline">
+                                            <button type="submit" class="btn btn-danger">Remover Disciplina</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4">
+                                <div class="text-muted">
+                                    <i class="bi bi-book fs-1 d-block mb-3"></i>
+                                    Nenhuma disciplina cadastrada nesta turma.
+                                </div>
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#adicionarDisciplina">
+                                    <i class="bi bi-plus-lg"></i> Adicionar Primeira Disciplina
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Adição -->
+    <div class="modal fade" id="adicionarDisciplina" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Adicionar Disciplina</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="{{ url_for('adicionar_disciplina_turma', turma_id=turma.id) }}" method="POST">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Nome da Disciplina</label>
+                            <input type="text" class="form-control" name="nome" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Descrição</label>
+                            <textarea class="form-control" name="descricao" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Carga Horária (horas)</label>
+                            <input type="number" class="form-control" name="carga_horaria" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Instrutor</label>
+                            <select class="form-select" name="instrutor_id">
+                                <option value="">Selecione um instrutor</option>
+                                {% for instrutor in instrutores %}
+                                <option value="{{ instrutor.id }}">{{ instrutor.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status" required>
+                                <option value="ativa">Ativa</option>
+                                <option value="concluída">Concluída</option>
+                                <option value="cancelada">Cancelada</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Adicionar Disciplina</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

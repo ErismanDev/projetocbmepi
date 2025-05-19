@@ -1,0 +1,363 @@
+.user-info {
+    text-align: center;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Estilos Gerais */
+body {
+    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+    min-height: 100vh;
+    font-family: 'Montserrat', Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Navbar */
+.navbar {
+    background: linear-gradient(90deg, #ff9800 60%, #b71c1c 100%) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: 1px;
+    font-size: 1.5rem;
+}
+
+.navbar-brand .rounded-circle {
+    background: #fff;
+    border: 3px solid #ff9800;
+    overflow: hidden;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+}
+
+.navbar-brand .rounded-circle img {
+    width: 38px;
+    height: 38px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.nav-link, .navbar-brand {
+    color: #fff !important;
+    font-weight: 600;
+    letter-spacing: 1px;
+    transition: color 0.2s, background 0.2s;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: #b71c1c !important;
+    background: #ffb74d !important;
+    border-radius: 20px;
+}
+
+.dropdown-item {
+    font-weight: 500;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* Cards */
+.card {
+    border: 2px solid #ff9800;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(255,152,0,0.07);
+    margin-bottom: 1rem;
+}
+
+.card-header {
+    background-color: #fff;
+    border-bottom: 1px solid rgba(0,0,0,.125);
+}
+
+/* Tabelas */
+.table thead th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+/* Botões */
+.btn-group {
+    gap: 0.5rem;
+}
+
+/* Formulários */
+.form-label {
+    font-weight: 500;
+}
+
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+/* Alertas */
+.alert {
+    margin-bottom: 1rem;
+}
+
+/* Footer */
+.footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+}
+
+/* Breadcrumbs */
+.breadcrumb {
+    background-color: transparent;
+    padding: 0;
+    margin-bottom: 1rem;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "›";
+}
+
+/* Modais */
+.modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.modal-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+}
+
+/* Ícones */
+.fas, .far, .fab {
+    width: 1.25em;
+    text-align: center;
+}
+
+/* Dropdown Menus */
+.dropdown-menu {
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15);
+    border: none;
+    border-radius: 0.5rem;
+}
+
+.dropdown-item {
+    padding: 0.5rem 1rem;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+.dropdown-item.active {
+    background-color: #0d6efd;
+}
+
+/* Submenus */
+.dropdown-submenu {
+    position: relative;
+}
+
+.dropdown-submenu .dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-top: -1px;
+}
+
+/* Animações */
+.dropdown-menu {
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.1rem;
+    }
+    
+    .nav-link {
+        padding: 0.5rem 1rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .table-responsive {
+        margin-bottom: 0;
+    }
+    
+    .navbar-nav {
+        padding: 1rem 0;
+    }
+    
+    .dropdown-menu {
+        border: none;
+        box-shadow: none;
+    }
+    
+    .card {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Menu Dropdown */
+.dropdown-menu {
+    border: none;
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+}
+
+.dropdown-item {
+    border-radius: 0.25rem;
+    padding: 0.5rem 1rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+    transform: translateX(5px);
+}
+
+.dropdown-item i {
+    width: 1.25em;
+    text-align: center;
+    margin-right: 0.5rem;
+    color: #6c757d;
+}
+
+.dropdown-divider {
+    margin: 0.5rem 0;
+}
+
+/* Menu Ativo */
+.nav-link.active {
+    background-color: rgba(255,255,255,.1);
+    border-radius: 0.25rem;
+}
+
+/* Submenu */
+.dropdown-submenu {
+    position: relative;
+}
+
+.dropdown-submenu .dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-top: -0.5rem;
+}
+
+/* Animação do Menu */
+.dropdown-menu {
+    animation: dropdownFade 0.2s ease-in-out;
+}
+
+@keyframes dropdownFade {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Sidebar mais larga e amigável */
+.sidebar, .sidebar-nav {
+    width: 260px !important;
+    min-width: 260px !important;
+    background: #1a237e;
+    color: #fff;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+}
+
+.sidebar .nav-link, .sidebar-nav .nav-link {
+    color: #fff;
+    font-size: 1.1rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+    transition: background 0.2s;
+}
+
+.sidebar .nav-link:hover, .sidebar-nav .nav-link:hover,
+.sidebar .nav-link.active, .sidebar-nav .nav-link.active {
+    background: #3949ab;
+    color: #fff;
+    text-decoration: none;
+}
+
+/* Ajuste para o conteúdo não ficar escondido atrás da sidebar */
+@media (min-width: 992px) {
+    .main-content {
+        margin-left: 260px;
+    }
+}
+
+.btn-danger, .btn-primary, .btn-warning, .btn-success {
+    border-radius: 30px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    background: linear-gradient(90deg, #ff9800 60%, #b71c1c 100%);
+    border: none;
+}
+
+.btn-danger:hover, .btn-primary:hover, .btn-warning:hover, .btn-success:hover {
+    filter: brightness(0.95);
+    transform: translateY(-2px) scale(1.03);
+}
+
+h1, h2, h3, h4, h5 {
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-weight: 700;
+    color: #ff9800;
+}
+
+.bombeiro-icon {
+    color: #ff9800;
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.rounded-circle {
+    border: 4px solid #b71c1c !important;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #b71c1c;
+    border-radius: 8px;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    background: #ffe5e5;
+} 

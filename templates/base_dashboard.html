@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} - Bombeiro Mirim</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --navbar-height: 60px;
+            --primary-color: #dc3545;
+            --primary-dark: #b02a37;
+            --secondary-bg: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f6fa;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+            padding: var(--navbar-height) 0 0;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, #8B0000 0%, #23272f 100%);
+            box-shadow: 2px 0 12px rgba(139,0,0,0.10);
+            transition: all 0.3s cubic-bezier(.4,0,.2,1);
+        }
+
+        .sidebar-sticky {
+            position: relative;
+            top: 0;
+            height: calc(100vh - var(--navbar-height));
+            padding: 1rem;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        .sidebar .nav-item {
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar .nav-link {
+            color: #fffbe7;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.91rem;
+            min-height: 28px;
+            letter-spacing: 0.01em;
+            font-weight: 500;
+            transition: background 0.2s, color 0.2s, transform 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .sidebar .nav-link:hover {
+            background: linear-gradient(90deg, #FFD700 0%, #FFA500 100%);
+            color: #8B0000;
+            border-color: #FFD700;
+            transform: scale(1.06);
+            box-shadow: 0 2px 8px rgba(255,215,0,0.10);
+        }
+
+        .sidebar .nav-link.active {
+            background: linear-gradient(90deg, #FFD700 0%, #dc3545 100%);
+            color: #8B0000;
+            border-color: #FFD700;
+            box-shadow: 0 2px 12px rgba(255,215,0,0.15);
+        }
+
+        .sidebar .nav-link i {
+            font-size: 1rem;
+            width: 16px;
+            text-align: center;
+            color: #FFD700;
+        }
+
+        .navbar-custom {
+            height: var(--navbar-height);
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            padding: 0 1.5rem;
+        }
+
+        .navbar-brand {
+            color: var(--primary-color) !important;
+            font-weight: 600;
+            font-size: 1.5rem;
+        }
+
+        .content {
+            margin-left: var(--sidebar-width);
+            padding: calc(var(--navbar-height) + 2.2rem) 2.5rem 2.5rem;
+            max-width: 1400px;
+            width: 100%;
+        }
+
+        .submenu {
+            padding-left: 2.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .submenu.show {
+            max-height: 500px;
+        }
+
+        .submenu .nav-link {
+            padding: 0.5rem 1rem;
+            font-size: 0.95rem;
+        }
+
+        .divider {
+            height: 1.5px;
+            background: linear-gradient(90deg, #FFD700 0%, #dc3545 100%);
+            margin: 1rem 0 0.7rem 0;
+            border-radius: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .content {
+                margin-left: 0;
+                padding: calc(var(--navbar-height) + 1rem) 1rem 1rem;
+            }
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.5rem 0.5rem 0.7rem;
+            border-bottom: 1px solid #23242a;
+        }
+
+        .user-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FFD700 40%, #dc3545 100%);
+            color: #8B0000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+            border: 2.5px solid #FFD700;
+            box-shadow: 0 2px 8px rgba(255,215,0,0.10);
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 700;
+            margin: 0;
+            color: #FFD700;
+            font-size: 1.08rem;
+            letter-spacing: 0.01em;
+        }
+
+        .user-role {
+            color: #fffbe7;
+            font-size: 0.85rem;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .confetti-container {
+            position: relative;
+            height: 60px;
+            overflow: hidden;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #dc3545;
+            opacity: 0.7;
+            animation: confetti-fall 3s ease-in-out infinite;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100%) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100%) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .sidebar-header h3 {
+            font-size: 1.15rem;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar Superior -->
+    {% set hide_navbar = request.endpoint in ['login', 'login_aluno'] %}
+    {% if not hide_navbar %}
+    <nav class="navbar navbar-custom fixed-top">
+        <div class="container-fluid">
+            <button class="btn d-md-none" type="button" onclick="toggleSidebar()">
+                <i class="bi bi-list"></i>
+            </button>
+            <span class="navbar-brand">Bombeiro Mirim</span>
+            <div class="d-flex align-items-center gap-3">
+                <div class="d-none d-md-block">
+                    <span class="text-dark">{{ session.get('usuario_nome', session.get('aluno_nome', '')) }}</span>
+                </div>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle"></i> {{ session.get('usuario_nome') or session.get('aluno_nome') }}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="{{ url_for('perfil_aluno') }}">
+                            <i class="bi bi-person-gear"></i> Meu Perfil
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{{ url_for('logout') }}">
+                            <i class="bi bi-box-arrow-right"></i> Sair
+                        </a></li>
+                    </ul>
+                </li>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    <!-- Menu Lateral -->
+    <div class="sidebar bg-dark">
+        <div class="sidebar-header">
+            <h3 class="text-white">Bombeiro Mirim</h3>
+        </div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+            </li>
+            {% if session.get('usuario_tipo') == 'admin' %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'listar_usuarios' %}active{% endif %}" href="{{ url_for('listar_usuarios') }}">
+                    <i class="bi bi-people"></i> Usuários
+                </a>
+            </li>
+            {% endif %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'listar_alunos' %}active{% endif %}" href="{{ url_for('listar_alunos') }}">
+                    <i class="bi bi-person"></i> Alunos
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'listar_instrutores' %}active{% endif %}" href="{{ url_for('listar_instrutores') }}">
+                    <i class="bi bi-person-badge"></i> Instrutores
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'listar_cursos' %}active{% endif %}" href="{{ url_for('listar_cursos') }}">
+                    <i class="bi bi-book"></i> Cursos
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'listar_turmas' %}active{% endif %}" href="{{ url_for('listar_turmas') }}">
+                    <i class="bi bi-mortarboard"></i> Turmas
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'listar_matriculas' %}active{% endif %}" href="{{ url_for('listar_matriculas') }}">
+                    <i class="bi bi-person-plus"></i> Matrículas
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'listar_diarios' %}active{% endif %}" href="{{ url_for('listar_diarios') }}">
+                    <i class="bi bi-journal-text"></i> Diário de Classe
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'listar_atividades' %}active{% endif %}" href="{{ url_for('listar_atividades') }}">
+                    <i class="bi bi-list-task"></i> Atividades
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'listar_presencas' %}active{% endif %}" href="{{ url_for('listar_presencas') }}">
+                    <i class="bi bi-calendar-check"></i> Presenças
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'listar_avaliacoes' %}active{% endif %}" href="{{ url_for('listar_avaliacoes') }}">
+                    <i class="bi bi-star"></i> Avaliações
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'listar_certificados' %}active{% endif %}" href="{{ url_for('listar_certificados') }}">
+                    <i class="bi bi-award"></i> Certificados
+                </a>
+            </li>
+            {% if session.get('usuario_tipo') == 'admin' %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'listar_relatorios' %}active{% endif %}" href="{{ url_for('listar_relatorios') }}">
+                    <i class="bi bi-file-earmark-text"></i> Relatórios
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <main class="content">
+        <!-- Modal de Aniversário -->
+        {% if session.get('aniversariante') and session.get('aniversariante_nome') %}
+        <div class="modal fade" id="aniversarioModal" tabindex="-1" aria-labelledby="aniversarioModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+              <div class="modal-header bg-danger text-white border-0">
+                <h5 class="modal-title w-100 text-center" id="aniversarioModalLabel">
+                  <i class="bi bi-emoji-laughing fs-2 text-warning"></i> Feliz Aniversário!
+                </h5>
+              </div>
+              <div class="modal-body text-center p-4">
+                <div class="confetti-container mb-3">
+                  <i class="bi bi-gift-fill text-danger fs-1"></i>
+                </div>
+                <h4 class="mb-3 text-danger">{{ session['aniversariante_nome'] }}</h4>
+                <p class="mb-3">Toda a equipe Bombeiro Mirim deseja muita saúde, alegria e conquistas!</p>
+                <div class="d-flex justify-content-center gap-2 mb-3">
+                  <span class="fs-1">🎉</span>
+                  <span class="fs-1">🎂</span>
+                  <span class="fs-1">🥳</span>
+                </div>
+                <div class="alert alert-warning mb-0">
+                  <i class="bi bi-star-fill text-danger"></i>
+                  Que este dia seja especial e repleto de momentos felizes!
+                </div>
+              </div>
+              <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-danger px-4" data-bs-dismiss="modal">
+                  <i class="bi bi-heart-fill me-2"></i>Obrigado!
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <style>
+        .confetti-container {
+          position: relative;
+          height: 60px;
+          overflow: hidden;
+        }
+
+        .confetti {
+          position: absolute;
+          width: 10px;
+          height: 10px;
+          background-color: #dc3545;
+          opacity: 0.7;
+          animation: confetti-fall 3s ease-in-out infinite;
+        }
+
+        @keyframes confetti-fall {
+          0% {
+            transform: translateY(-100%) rotate(0deg);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(100%) rotate(360deg);
+            opacity: 0;
+          }
+        }
+        </style>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          // Criar confetes
+          const container = document.querySelector('.confetti-container');
+          for (let i = 0; i < 20; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = Math.random() * 100 + '%';
+            confetti.style.animationDelay = Math.random() * 2 + 's';
+            confetti.style.backgroundColor = ['#dc3545', '#ffc107', '#0dcaf0'][Math.floor(Math.random() * 3)];
+            container.appendChild(confetti);
+          }
+
+          // Mostrar modal
+          var aniversarioModal = new bootstrap.Modal(document.getElementById('aniversarioModal'));
+          aniversarioModal.show();
+        });
+        </script>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block scripts %}{% endblock %}
+
+    <script>
+        // Toggle do menu lateral em dispositivos móveis
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('show');
+        }
+
+        // Marca o item do menu atual como ativo
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                    // Se o link estiver em um submenu, expande o menu pai
+                    const submenu = link.closest('.submenu');
+                    if (submenu) {
+                        submenu.classList.add('show');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

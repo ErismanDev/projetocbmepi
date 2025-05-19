@@ -1,0 +1,168 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Detalhes do Instrutor{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2 fw-bold text-danger">Detalhes do Instrutor</h1>
+        <div>
+            <a href="{{ url_for('listar_instrutores') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+            <a href="{{ url_for('editar_instrutor', instrutor_id=instrutor.id) }}" class="btn btn-primary">
+                <i class="bi bi-pencil"></i> Editar
+            </a>
+        </div>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card shadow-lg border-0 text-center bg-light">
+                <div class="card-body py-4">
+                    {% if instrutor.foto %}
+                        <img src="{{ url_for('static', filename=instrutor.foto.lstrip('/')) }}" alt="Foto do Instrutor" class="img-fluid rounded-circle border border-3 border-danger mb-3" style="max-width: 180px;">
+                    {% else %}
+                        <img src="{{ url_for('static', filename='img/default-avatar.png') }}" alt="Foto Padrão" class="img-fluid rounded-circle border border-3 border-danger mb-3" style="max-width: 180px;">
+                    {% endif %}
+                    <h3 class="fw-bold text-danger mb-1">{{ instrutor.nome }}</h3>
+                    <span class="badge {% if instrutor.status == 'ativo' %}bg-success{% else %}bg-danger{% endif %} px-3 py-2 mb-2">{{ instrutor.status|title }}</span>
+                    <div class="mb-2">
+                        <span class="text-secondary small">{{ instrutor.email }}</span>
+                    </div>
+                    <div class="mb-2">
+                        <i class="bi bi-calendar-event text-danger"></i>
+                        <span class="fw-semibold">Nascimento:</span> {{ instrutor.data_nascimento.strftime('%d/%m/%Y') if instrutor.data_nascimento else 'Não informado' }}
+                    </div>
+                    <div class="mb-2">
+                        <i class="bi bi-telephone text-danger"></i>
+                        <span class="fw-semibold">Telefone:</span> {{ instrutor.telefone }}
+                    </div>
+                    <div class="mb-2">
+                        <i class="bi bi-telephone-forward text-danger"></i>
+                        <span class="fw-semibold">Emergência:</span> {{ instrutor.telefone_emergencia or 'Não informado' }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="row g-4">
+                <div class="col-12">
+                    <div class="card shadow border-0 mb-3">
+                        <div class="card-header bg-danger text-white">
+                            <h5 class="mb-0">Dados Profissionais</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Formação:</strong> {{ instrutor.formacao or 'Não informada' }}</p>
+                                    <p><strong>Especialização:</strong> {{ instrutor.especializacao or 'Não informada' }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Data de Admissão:</strong> {{ instrutor.data_admissao.strftime('%d/%m/%Y') if instrutor.data_admissao else 'Não informada' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="card shadow border-0 mb-3">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">Endereço</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>CEP:</strong> {{ instrutor.cep or 'Não informado' }}</p>
+                                    <p><strong>Logradouro:</strong> {{ instrutor.logradouro or 'Não informado' }}</p>
+                                    <p><strong>Número:</strong> {{ instrutor.numero or 'Não informado' }}</p>
+                                    <p><strong>Complemento:</strong> {{ instrutor.complemento or 'Não informado' }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Bairro:</strong> {{ instrutor.bairro or 'Não informado' }}</p>
+                                    <p><strong>Cidade:</strong> {{ instrutor.cidade or 'Não informada' }}</p>
+                                    <p><strong>Estado:</strong> {{ instrutor.estado or 'Não informado' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="card shadow border-0 mb-3">
+                        <div class="card-header bg-secondary text-white">
+                            <h5 class="mb-0">Documentos Enviados</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if instrutor.certificados %}
+                            <ul class="list-group">
+                                {% for doc in instrutor.certificados.split(';') if doc %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <a href="{{ url_for('static', filename=doc) }}" target="_blank">
+                                        <i class="bi bi-file-earmark-text me-2"></i>{{ doc.split('/')[-1] }}
+                                    </a>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            {% else %}
+                            <div class="text-muted">Nenhum documento enviado.</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Alterar Senha -->
+<div class="modal fade" id="modalAlterarSenha{{ instrutor.id }}" tabindex="-1" role="dialog" aria-labelledby="modalAlterarSenhaLabel{{ instrutor.id }}" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalAlterarSenhaLabel{{ instrutor.id }}">Alterar Senha</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{{ url_for('alterar_senha_instrutor', instrutor_id=instrutor.id) }}" method="POST">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="nova_senha">Nova Senha</label>
+                        <input type="password" class="form-control" id="nova_senha" name="nova_senha" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmar_senha">Confirmar Nova Senha</label>
+                        <input type="password" class="form-control" id="confirmar_senha" name="confirmar_senha" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Excluir -->
+<div class="modal fade" id="modalExcluir{{ instrutor.id }}" tabindex="-1" role="dialog" aria-labelledby="modalExcluirLabel{{ instrutor.id }}" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalExcluirLabel{{ instrutor.id }}">Confirmar Exclusão</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Tem certeza que deseja excluir o instrutor {{ instrutor.nome }}?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <form action="{{ url_for('excluir_instrutor', instrutor_id=instrutor.id) }}" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,16 @@
+<!-- Este template não é mais utilizado. Use editar_nome_documento_instrutor.html para edição de documentos de instrutor/admin. -->
+{% extends "base_dashboard.html" %}
+{% block title %}Editar Nome do Documento{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h3>Editar Nome do Documento</h3>
+    <form method="POST">
+        <div class="mb-3">
+            <label class="form-label">Nome identificador</label>
+            <input type="text" class="form-control" name="novo_nome" value="{{ doc.split('/')[-1] }}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Salvar</button>
+        <a href="{{ url_for('detalhes_usuario', usuario_id=usuario.id) }}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %} 

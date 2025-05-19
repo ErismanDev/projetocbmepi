@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Área do Aluno{% endblock %}
+
+{% block main_content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="card shadow p-4" style="max-width: 400px; width: 100%;">
+        <div class="text-center mb-3">
+            <span class="rounded-circle bg-white d-flex align-items-center justify-content-center mx-auto mb-2" style="width:70px; height:70px; overflow:hidden; border:3px solid #b71c1c;">
+                <img src="{{ url_for('static', filename='img/logo_cbmepi.png') }}" alt="Logo CBMEPI" style="width:60px; height:60px; object-fit:cover;">
+            </span>
+            <h2 class="mb-0" style="color:#b71c1c;">Área do Aluno</h2>
+        </div>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <form method="POST" action="{{ url_for('login_aluno') }}">
+            <div class="mb-3">
+                <label for="matricula" class="form-label">Matrícula</label>
+                <input type="text" class="form-control" id="matricula" name="matricula" required>
+            </div>
+            <div class="mb-3">
+                <label for="senha" class="form-label">Senha</label>
+                <input type="password" class="form-control" id="senha" name="senha" required>
+            </div>
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-danger">Entrar</button>
+            </div>
+        </form>
+        <div class="text-center mt-3">
+            <a href="{{ url_for('login') }}" class="text-decoration-none">Área Restrita</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

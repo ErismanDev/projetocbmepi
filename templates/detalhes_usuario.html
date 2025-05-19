@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+
+{% block title %}Detalhes do Usuário{% endblock %}
+
+{% block main_content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Detalhes do Usuário</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+        <li class="breadcrumb-item active">Detalhes do Usuário</li>
+    </ol>
+
+    <div class="row">
+        <!-- Coluna da Esquerda - Foto e Status -->
+        <div class="col-xl-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-user me-1"></i>
+                    Foto e Status
+                </div>
+                <div class="card-body text-center">
+                    {% if usuario.foto %}
+                    <img src="{{ url_for('static', filename=usuario.foto) }}" 
+                         alt="Foto do usuário" 
+                         class="rounded-circle mb-3" 
+                         style="width: 150px; height: 150px; object-fit: cover; border: 3px solid #dc3545;">
+                    {% else %}
+                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center mx-auto mb-3" 
+                         style="width: 150px; height: 150px; font-size: 3rem; border: 3px solid #dc3545;">
+                        <i class="bi bi-person"></i>
+                    </div>
+                    {% endif %}
+                    <h5 class="card-title">{{ usuario.nome }}</h5>
+                    <p class="card-text">
+                        <span class="badge {% if usuario.status == 'ativo' %}bg-success{% else %}bg-danger{% endif %}">
+                            {{ usuario.status|title }}
+                        </span>
+                    </p>
+                    <p class="card-text">
+                        <small class="text-muted">Tipo: {{ usuario.tipo|title }}</small>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coluna da Direita - Informações Detalhadas -->
+        <div class="col-xl-8">
+            <!-- Dados Pessoais -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-id-card me-1"></i>
+                    Dados Pessoais
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Nome Completo:</strong> {{ usuario.nome }}</p>
+                            <p><strong>E-mail:</strong> {{ usuario.email }}</p>
+                            <p><strong>RG:</strong> {{ usuario.rg or 'Não informado' }}</p>
+                            <p><strong>CPF:</strong> {{ usuario.cpf or 'Não informado' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Data de Nascimento:</strong> {{ usuario.data_nascimento.strftime('%d/%m/%Y') if usuario.data_nascimento else 'Não informado' }}</p>
+                            <p><strong>Telefone:</strong> {{ usuario.telefone or 'Não informado' }}</p>
+                            <p><strong>Telefone de Emergência:</strong> {{ usuario.telefone_emergencia or 'Não informado' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Endereço -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-map-marker-alt me-1"></i>
+                    Endereço
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>CEP:</strong> {{ usuario.cep or 'Não informado' }}</p>
+                            <p><strong>Logradouro:</strong> {{ usuario.logradouro or 'Não informado' }}</p>
+                            <p><strong>Número:</strong> {{ usuario.numero or 'Não informado' }}</p>
+                            <p><strong>Complemento:</strong> {{ usuario.complemento or 'Não informado' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Bairro:</strong> {{ usuario.bairro or 'Não informado' }}</p>
+                            <p><strong>Cidade:</strong> {{ usuario.cidade or 'Não informado' }}</p>
+                            <p><strong>Estado:</strong> {{ usuario.estado or 'Não informado' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dados Profissionais (apenas para instrutores) -->
+            {% if usuario.tipo == 'instrutor' %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-briefcase me-1"></i>
+                    Dados Profissionais
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Formação:</strong> {{ usuario.formacao or 'Não informado' }}</p>
+                            <p><strong>Especialização:</strong> {{ usuario.especializacao or 'Não informado' }}</p>
+                            <p><strong>Número de Registro:</strong> {{ usuario.numero_registro or 'Não informado' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Data de Admissão:</strong> {{ usuario.data_admissao.strftime('%d/%m/%Y') if usuario.data_admissao else 'Não informado' }}</p>
+                            <p><strong>Área de Atuação:</strong> {{ usuario.area_atuacao or 'Não informado' }}</p>
+                            <p><strong>Anos de Experiência:</strong> {{ usuario.anos_experiencia or 'Não informado' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Documentos -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-file-alt me-1"></i>
+                    Documentos
+                </div>
+                <div class="card-body">
+                    {% if usuario.certificados %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Documento</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for doc in (usuario.certificados or '').split(';') %}
+                                        {% if doc %}
+                                        <tr>
+                                            <td>{{ doc.split('/')[-1] }}</td>
+                                            <td>
+                                                <a href="{{ url_for('static', filename=doc) }}" class="btn btn-sm btn-primary" target="_blank">
+                                                    <i class="fas fa-eye"></i> Visualizar
+                                                </a>
+                                                {% if session.get('usuario_tipo') == 'admin' %}
+                                                <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#excluirDocumentoModal{{ loop.index }}">
+                                                    <i class="fas fa-trash"></i> Excluir
+                                                </button>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Nenhum documento cadastrado.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Ações -->
+            {% if session.get('usuario_tipo') == 'admin' %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-cogs me-1"></i>
+                    Ações
+                </div>
+                <div class="card-body">
+                    <a href="{{ url_for('editar_usuario', usuario_id=usuario.id) }}" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Editar Dados
+                    </a>
+                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#alterarSenhaModal">
+                        <i class="fas fa-key"></i> Alterar Senha
+                    </button>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#excluirUsuarioModal">
+                        <i class="fas fa-trash"></i> Excluir Usuário
+                    </button>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal Alterar Senha -->
+<div class="modal fade" id="alterarSenhaModal" tabindex="-1" aria-labelledby="alterarSenhaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="alterarSenhaModalLabel">Alterar Senha</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ url_for('alterar_senha_usuario', usuario_id=usuario.id) }}" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nova_senha" class="form-label">Nova Senha</label>
+                        <input type="password" class="form-control" id="nova_senha" name="nova_senha" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Excluir Usuário -->
+<div class="modal fade" id="excluirUsuarioModal" tabindex="-1" aria-labelledby="excluirUsuarioModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="excluirUsuarioModalLabel">Excluir Usuário</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form action="{{ url_for('excluir_usuario', usuario_id=usuario.id) }}" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modais para Excluir Documentos -->
+{% for doc in (usuario.certificados or '').split(';') %}
+    {% if doc %}
+    <div class="modal fade" id="excluirDocumentoModal{{ loop.index }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Excluir Documento</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Tem certeza que deseja excluir este documento?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <form action="{{ url_for('excluir_documento_instrutor_admin', usuario_id=session.get('usuario_id'), instrutor_id=usuario.id, doc_idx=loop.index0) }}" method="POST">
+                        <button type="submit" class="btn btn-danger">Excluir</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+{% endfor %}
+{% endblock %}
+
+{% block scripts %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+{% endblock %} 

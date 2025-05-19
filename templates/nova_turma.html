@@ -1,0 +1,307 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Nova Turma{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('listar_turmas') }}">Turmas</a></li>
+                    <li class="breadcrumb-item active">Nova Turma</li>
+                </ol>
+            </nav>
+            <h2 class="h3 mb-0">Nova Turma</h2>
+            <p class="text-muted">Cadastro de nova turma</p>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white d-flex align-items-center">
+                    <i class="bi bi-people-plus-fill me-2 fs-4"></i>
+                    <h5 class="card-title mb-0">Nova Turma</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" class="needs-validation" novalidate>
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row g-3">
+                            <!-- Nome da Turma -->
+                            <div class="col-md-12">
+                                <div class="form-floating">
+                                    {{ form.nome(class="form-control", placeholder="Nome da Turma") }}
+                                    <label for="nome">Nome da Turma</label>
+                                    {% if form.nome.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.nome.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Curso -->
+                            <div class="col-md-12">
+                                <div class="form-floating">
+                                    {{ form.curso_id(class="form-select", placeholder="Curso") }}
+                                    <label for="curso_id">Curso</label>
+                                    {% if form.curso_id.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.curso_id.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Coordenador -->
+                            <div class="col-md-12">
+                                <div class="form-floating">
+                                    {{ form.instrutor_id(class="form-select", placeholder="Coordenador") }}
+                                    <label for="instrutor_id">Coordenador</label>
+                                    {% if form.instrutor_id.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.instrutor_id.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Datas -->
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.data_inicio(class="form-control", type="date", placeholder="Data de Início") }}
+                                    <label for="data_inicio">Data de Início</label>
+                                    {% if form.data_inicio.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.data_inicio.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.data_fim(class="form-control", type="date", placeholder="Data de Término") }}
+                                    <label for="data_fim">Data de Término</label>
+                                    {% if form.data_fim.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.data_fim.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Turno -->
+                            <div class="col-md-12">
+                                <div class="form-floating">
+                                    {{ form.turno(class="form-select", placeholder="Turno", onchange="toggleHorarios()") }}
+                                    <label for="turno">Turno</label>
+                                    {% if form.turno.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.turno.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Horários Manhã -->
+                            <div class="col-md-6 horario-manha">
+                                <div class="form-floating">
+                                    {{ form.horario_inicio_manha(class="form-control", type="time", placeholder="Horário Início Manhã") }}
+                                    <label for="horario_inicio_manha">Horário Início Manhã</label>
+                                    {% if form.horario_inicio_manha.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.horario_inicio_manha.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 horario-manha">
+                                <div class="form-floating">
+                                    {{ form.horario_fim_manha(class="form-control", type="time", placeholder="Horário Fim Manhã") }}
+                                    <label for="horario_fim_manha">Horário Fim Manhã</label>
+                                    {% if form.horario_fim_manha.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.horario_fim_manha.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Horários Tarde -->
+                            <div class="col-md-6 horario-tarde">
+                                <div class="form-floating">
+                                    {{ form.horario_inicio_tarde(class="form-control", type="time", placeholder="Horário Início Tarde") }}
+                                    <label for="horario_inicio_tarde">Horário Início Tarde</label>
+                                    {% if form.horario_inicio_tarde.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.horario_inicio_tarde.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 horario-tarde">
+                                <div class="form-floating">
+                                    {{ form.horario_fim_tarde(class="form-control", type="time", placeholder="Horário Fim Tarde") }}
+                                    <label for="horario_fim_tarde">Horário Fim Tarde</label>
+                                    {% if form.horario_fim_tarde.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.horario_fim_tarde.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Local -->
+                            <div class="col-md-12">
+                                <div class="form-floating">
+                                    {{ form.local(class="form-control", placeholder="Local") }}
+                                    <label for="local">Local</label>
+                                    {% if form.local.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.local.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Vagas -->
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.vagas(class="form-control", type="number", min="1", placeholder="Vagas") }}
+                                    <label for="vagas">Vagas</label>
+                                    {% if form.vagas.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.vagas.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Status -->
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.status(class="form-select", placeholder="Status") }}
+                                    <label for="status">Status</label>
+                                    {% if form.status.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.status.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Observações -->
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    {{ form.observacoes(class="form-control", style="height: 100px", placeholder="Observações") }}
+                                    <label for="observacoes">Observações</label>
+                                    {% if form.observacoes.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.observacoes.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a href="{{ url_for('listar_turmas') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-check-circle me-2"></i>Salvar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+// Validação do formulário
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+
+// Validação de datas
+document.addEventListener('DOMContentLoaded', function() {
+    const dataInicio = document.getElementById('data_inicio');
+    const dataTermino = document.getElementById('data_fim');
+
+    dataInicio.addEventListener('change', function() {
+        if (dataTermino.value && dataInicio.value > dataTermino.value) {
+            dataTermino.value = dataInicio.value;
+        }
+    });
+
+    dataTermino.addEventListener('change', function() {
+        if (dataInicio.value && dataTermino.value < dataInicio.value) {
+            alert('A data de término não pode ser anterior à data de início!');
+            dataTermino.value = dataInicio.value;
+        }
+    });
+});
+
+// Função para mostrar/esconder campos de horário baseado no turno
+function toggleHorarios() {
+    const turno = document.getElementById('turno').value;
+    const horariosManha = document.querySelectorAll('.horario-manha');
+    const horariosTarde = document.querySelectorAll('.horario-tarde');
+
+    horariosManha.forEach(el => el.style.display = turno === 'manha' || turno === 'integral' ? 'block' : 'none');
+    horariosTarde.forEach(el => el.style.display = turno === 'tarde' || turno === 'integral' ? 'block' : 'none');
+}
+
+// Executa a função ao carregar a página
+document.addEventListener('DOMContentLoaded', toggleHorarios);
+</script>
+{% endblock %}
+{% endblock %} 

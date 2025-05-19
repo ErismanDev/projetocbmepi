@@ -1,0 +1,67 @@
+{% extends "base_dashboard.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Diários de Classe</h2>
+        {% if session.get('usuario_tipo') == 'admin' or session.get('usuario_tipo') == 'instrutor' %}
+        <a href="{{ url_for('novo_diario') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Novo Diário
+        </a>
+        {% endif %}
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Turma</th>
+                    <th>Data da Aula</th>
+                    <th>Conteúdo</th>
+                    <th>Observações</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for diario in diarios %}
+                <tr>
+                    <td>{{ diario.turma.nome }}</td>
+                    <td>{{ diario.data_aula.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ diario.conteudo[:100] }}{% if diario.conteudo|length > 100 %}...{% endif %}</td>
+                    <td>{{ diario.observacoes[:100] if diario.observacoes else '-' }}{% if diario.observacoes and diario.observacoes|length > 100 %}...{% endif %}</td>
+                    <td>
+                        <a href="{{ url_for('editar_diario', id=diario.id) }}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#excluirModal{{ diario.id }}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                
+                <!-- Modal de Confirmação de Exclusão -->
+                <div class="modal fade" id="excluirModal{{ diario.id }}" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Confirmar Exclusão</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                Tem certeza que deseja excluir o diário de classe da turma {{ diario.turma.nome }} do dia {{ diario.data_aula.strftime('%d/%m/%Y') }}?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <form action="{{ url_for('excluir_diario', id=diario.id) }}" method="POST" class="d-inline">
+                                    <button type="submit" class="btn btn-danger">Excluir</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %} 

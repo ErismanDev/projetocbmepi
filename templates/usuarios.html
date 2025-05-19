@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Usuários{% endblock %}
+
+{% block main_content %}
+<div class="container-fluid">
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="h3 mb-0">Usuários</h2>
+            <p class="text-muted">Lista de usuários cadastrados</p>
+        </div>
+        <div>
+            <a href="{{ url_for('cadastrar_usuario') }}" class="btn btn-primary me-2">
+                <i class="bi bi-person-plus"></i> Novo Usuário
+            </a>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </div>
+
+    <!-- Alertas -->
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-info alert-dismissible fade show" role="alert">
+                            {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+    <!-- Lista Simples de Usuários -->
+    <div class="list-group">
+        {% for usuario in usuarios %}
+        <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+            <div>
+                <strong>{{ usuario.nome }}</strong><br>
+                <span class="text-muted">{{ usuario.email }}</span><br>
+                <span class="badge bg-secondary">{{ usuario.tipo|title }}</span><br>
+                <small class="text-muted">Cadastrado em: {{ usuario.created_at.strftime('%d/%m/%Y às %H:%M') if usuario.created_at else '-' }}</small>
+            </div>
+            <div class="d-flex gap-2">
+                <form method="POST" action="{{ url_for('atualizar_usuario', usuario_id=usuario.id) }}" class="mb-0">
+                    <input type="hidden" name="nome" value="{{ usuario.nome }}">
+                    <input type="hidden" name="email" value="{{ usuario.email }}">
+                    <input type="hidden" name="cpf" value="{{ usuario.cpf }}">
+                    <input type="hidden" name="rg" value="{{ usuario.rg }}">
+                    <input type="hidden" name="tipo" value="{{ usuario.tipo }}">
+                    <input type="hidden" name="status" value="{% if usuario.status == 'ativo' %}inativo{% else %}ativo{% endif %}">
+                    <button type="submit" class="btn btn-sm {% if usuario.status == 'ativo' %}btn-danger{% else %}btn-success{% endif %}">
+                        {% if usuario.status == 'ativo' %}Desativar{% else %}Ativar{% endif %}
+                    </button>
+                </form>
+                <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#alterarSenhaModal{{ usuario.id }}">
+                    <i class="bi bi-key"></i> Resetar Senha
+                </button>
+                <a href="{{ url_for('editar_usuario', usuario_id=usuario.id) }}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-pencil"></i> Editar
+                </a>
+            </div>
+                </div>
+
+        <!-- Modal Alterar Senha -->
+        <div class="modal fade" id="alterarSenhaModal{{ usuario.id }}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                        <h5 class="modal-title">Alterar Senha</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <form method="POST" action="{{ url_for('alterar_senha_usuario', usuario_id=usuario.id) }}">
+                                                <div class="modal-body">
+                                                    <div class="mb-3">
+                                                        <label for="nova_senha{{ usuario.id }}" class="form-label">Nova Senha</label>
+                                                        <input type="password" class="form-control" id="nova_senha{{ usuario.id }}" name="nova_senha" required minlength="6">
+                                                        <div class="form-text">A senha deve ter no mínimo 6 caracteres.</div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                    <button type="submit" class="btn btn-warning">Alterar Senha</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+{% endblock %} 

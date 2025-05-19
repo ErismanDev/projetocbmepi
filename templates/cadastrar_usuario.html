@@ -1,0 +1,155 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Cadastrar Usuário{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('listar_usuarios') }}">Usuários</a></li>
+                    <li class="breadcrumb-item active">Novo Usuário</li>
+                </ol>
+            </nav>
+            <h2 class="h3 mb-0">Novo Usuário</h2>
+            <p class="text-muted">Cadastre um novo usuário no sistema</p>
+        </div>
+        <div>
+            <a href="{{ url_for('listar_usuarios') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </div>
+
+    <!-- Alertas -->
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+    <!-- Formulário de Cadastro -->
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('cadastrar_usuario') }}" id="formCadastro">
+                        <div class="mb-3">
+                            <label for="tipo" class="form-label">Tipo de Usuário <span class="text-danger">*</span></label>
+                            <select class="form-select" id="tipo" name="tipo" required onchange="toggleFields()">
+                                <option value="">Selecione...</option>
+                                <option value="admin">Administrador</option>
+                                <option value="instrutor">Instrutor</option>
+                                <option value="aluno">Aluno</option>
+                            </select>
+                        </div>
+
+                        <!-- Campos para Administrador -->
+                        <div id="campos-admin" style="display: none;">
+                            <div class="mb-3">
+                                <label for="nome" class="form-label">Nome Completo <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="nome" name="nome" required minlength="3" maxlength="100">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="senha" class="form-label">Senha <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="senha" name="senha" required minlength="6">
+                                <div class="form-text">A senha deve ter no mínimo 6 caracteres</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="confirmar_senha" class="form-label">Confirmar Senha <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="confirmar_senha" name="confirmar_senha" required minlength="6">
+                            </div>
+                        </div>
+
+                        <!-- Campos para Instrutor -->
+                        <div id="campos-instrutor" style="display: none;">
+                            <div class="mb-3">
+                                <label for="instrutor_id" class="form-label">Selecione o Instrutor <span class="text-danger">*</span></label>
+                                <select class="form-select" id="instrutor_id" name="instrutor_id" required>
+                                    <option value="">Selecione um instrutor...</option>
+                                    {% for instrutor in instrutores %}
+                                        <option value="{{ instrutor.id }}">{{ instrutor.nome }} - {{ instrutor.email }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">A senha padrão será: 123456</div>
+                            </div>
+                        </div>
+
+                        <!-- Campos para Aluno -->
+                        <div id="campos-aluno" style="display: none;">
+                            <div class="mb-3">
+                                <label for="aluno_id" class="form-label">Selecione o Aluno <span class="text-danger">*</span></label>
+                                <select class="form-select" id="aluno_id" name="aluno_id" required>
+                                    <option value="">Selecione um aluno...</option>
+                                    {% for aluno in alunos %}
+                                        <option value="{{ aluno.id }}">{{ aluno.nome }} - {{ aluno.email }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">A senha padrão será: 123456</div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Cadastrar
+                            </button>
+                    </div>
+                </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+<script>
+function toggleFields() {
+    const tipo = document.getElementById('tipo').value;
+    
+    // Esconde todos os campos
+    document.getElementById('campos-admin').style.display = 'none';
+    document.getElementById('campos-instrutor').style.display = 'none';
+    document.getElementById('campos-aluno').style.display = 'none';
+    
+    // Mostra os campos correspondentes ao tipo selecionado
+    if (tipo === 'admin') {
+        document.getElementById('campos-admin').style.display = 'block';
+    } else if (tipo === 'instrutor') {
+        document.getElementById('campos-instrutor').style.display = 'block';
+    } else if (tipo === 'aluno') {
+        document.getElementById('campos-aluno').style.display = 'block';
+    }
+}
+
+// Validação do formulário
+document.getElementById('formCadastro').addEventListener('submit', function(e) {
+    const tipo = document.getElementById('tipo').value;
+    
+    if (tipo === 'admin') {
+        const senha = document.getElementById('senha').value;
+        const confirmarSenha = document.getElementById('confirmar_senha').value;
+        
+        if (senha !== confirmarSenha) {
+            e.preventDefault();
+            alert('As senhas não coincidem!');
+        }
+    }
+    });
+</script>
+{% endblock %} 

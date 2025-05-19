@@ -1,0 +1,232 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Editar Instrutor{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3>Editar Instrutor</h3>
+    <form method="POST" enctype="multipart/form-data">
+        <!-- Dados Pessoais -->
+        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">Dados Pessoais</h5>
+                            </div>
+                            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Nome Completo</label>
+                        <input type="text" class="form-control" name="nome" value="{{ instrutor.nome }}" required>
+                                </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email" value="{{ instrutor.email }}" required>
+                                </div>
+                                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">CPF</label>
+                        <input type="text" class="form-control" name="cpf" value="{{ instrutor.cpf }}" required>
+                                </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">RG</label>
+                        <input type="text" class="form-control" name="rg" value="{{ instrutor.rg }}" required>
+                                </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Data de Nascimento</label>
+                        <input type="date" class="form-control" name="data_nascimento" value="{{ instrutor.data_nascimento.strftime('%Y-%m-%d') if instrutor.data_nascimento else '' }}" required>
+                                </div>
+                                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Telefone</label>
+                        <input type="text" class="form-control" name="telefone" value="{{ instrutor.telefone }}" required>
+                                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Telefone de Emergência</label>
+                        <input type="text" class="form-control" name="telefone_emergencia" value="{{ instrutor.telefone_emergencia }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+        <!-- Dados Profissionais -->
+        <div class="card mb-4">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0">Dados Profissionais</h5>
+                            </div>
+                            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Formação</label>
+                        <input type="text" class="form-control" name="formacao" value="{{ instrutor.formacao }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Especialização</label>
+                        <input type="text" class="form-control" name="especializacao" value="{{ instrutor.especializacao }}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Número de Registro</label>
+                        <input type="text" class="form-control" name="numero_registro" value="{{ instrutor.numero_registro }}">
+                                </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Data de Admissão</label>
+                        <input type="date" class="form-control" name="data_admissao" value="{{ instrutor.data_admissao.strftime('%Y-%m-%d') if instrutor.data_admissao else '' }}">
+                                </div>
+                                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Status</label>
+                        <select class="form-select" name="status" required>
+                                        <option value="ativo" {% if instrutor.status == 'ativo' %}selected{% endif %}>Ativo</option>
+                                        <option value="inativo" {% if instrutor.status == 'inativo' %}selected{% endif %}>Inativo</option>
+                            <option value="afastado" {% if instrutor.status == 'afastado' %}selected{% endif %}>Afastado</option>
+                                    </select>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+
+        <!-- Endereço -->
+        <div class="card mb-4">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0">Endereço</h5>
+                            </div>
+                            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">CEP</label>
+                        <input type="text" class="form-control" name="cep" value="{{ instrutor.cep }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Logradouro</label>
+                        <input type="text" class="form-control" name="logradouro" value="{{ instrutor.logradouro }}">
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">Número</label>
+                        <input type="text" class="form-control" name="numero" value="{{ instrutor.numero }}">
+                                </div>
+                                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Complemento</label>
+                        <input type="text" class="form-control" name="complemento" value="{{ instrutor.complemento }}">
+                                </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Bairro</label>
+                        <input type="text" class="form-control" name="bairro" value="{{ instrutor.bairro }}">
+                                </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Cidade</label>
+                        <input type="text" class="form-control" name="cidade" value="{{ instrutor.cidade }}">
+                                </div>
+                                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Estado</label>
+                        <select class="form-select" name="estado">
+                                        <option value="">Selecione...</option>
+                            {% for sigla, nome in [
+                                            ('AC', 'Acre'), ('AL', 'Alagoas'), ('AP', 'Amapá'), ('AM', 'Amazonas'),
+                                            ('BA', 'Bahia'), ('CE', 'Ceará'), ('DF', 'Distrito Federal'), ('ES', 'Espírito Santo'),
+                                            ('GO', 'Goiás'), ('MA', 'Maranhão'), ('MT', 'Mato Grosso'), ('MS', 'Mato Grosso do Sul'),
+                                            ('MG', 'Minas Gerais'), ('PA', 'Pará'), ('PB', 'Paraíba'), ('PR', 'Paraná'),
+                                            ('PE', 'Pernambuco'), ('PI', 'Piauí'), ('RJ', 'Rio de Janeiro'), ('RN', 'Rio Grande do Norte'),
+                                            ('RS', 'Rio Grande do Sul'), ('RO', 'Rondônia'), ('RR', 'Roraima'), ('SC', 'Santa Catarina'),
+                                            ('SP', 'São Paulo'), ('SE', 'Sergipe'), ('TO', 'Tocantins')
+                                        ] %}
+                                <option value="{{ sigla }}" {% if instrutor.estado == sigla %}selected{% endif %}>{{ nome }}</option>
+                                        {% endfor %}
+                                    </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+        <!-- Documentos -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">Documentos</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Foto</label>
+                        <input type="file" class="form-control" name="foto" accept="image/*">
+                        {% if instrutor.foto %}
+                            <div class="mt-2">
+                                <img src="{{ url_for('static', filename=instrutor.foto) }}" alt="Foto atual" class="img-thumbnail" style="max-width: 200px;">
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Certificados</label>
+                        <input type="file" class="form-control" name="certificados" multiple>
+                        {% if instrutor.certificados %}
+                            <div class="mt-2">
+                                <p>Documentos atuais:</p>
+                <ul class="list-group">
+                                    {% for doc in instrutor.certificados.split(';') %}
+                                        {% if doc %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <a href="{{ url_for('static', filename=doc) }}" target="_blank">
+                            <i class="bi bi-file-earmark-text me-2"></i>{{ doc.split('/')[-1] }}
+                        </a>
+                                                <div class="btn-group">
+                                                    <a href="{{ url_for('editar_nome_documento_instrutor_admin', usuario_id=session['usuario_id'], instrutor_id=instrutor.id, doc_idx=loop.index0) }}" 
+                                                       class="btn btn-sm btn-outline-primary">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </a>
+                                                    <form action="{{ url_for('excluir_documento_instrutor_admin', usuario_id=session['usuario_id'], instrutor_id=instrutor.id, doc_idx=loop.index0) }}" 
+                                                          method="POST" style="display: inline;">
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                                onclick="return confirm('Tem certeza que deseja excluir este documento?')">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                    </li>
+                                        {% endif %}
+                    {% endfor %}
+                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Observações -->
+        <div class="card mb-4">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">Observações</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Observações Gerais</label>
+                    <textarea class="form-control" name="observacoes" rows="3">{{ instrutor.observacoes }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between mb-4">
+            <a href="{{ url_for('listar_instrutores') }}" class="btn btn-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+    </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $('input[name="cpf"]').mask('000.000.000-00');
+        $('input[name="telefone"]').mask('(00) 00000-0000');
+        $('input[name="telefone_emergencia"]').mask('(00) 00000-0000');
+        $('input[name="cep"]').mask('00000-000');
+    });
+</script>
+{% endblock %} 

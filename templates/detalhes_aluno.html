@@ -1,0 +1,257 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Detalhes do Aluno{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="h3 mb-0">Detalhes do Aluno</h2>
+            <p class="text-muted">Visualize os dados do aluno</p>
+        </div>
+        <div>
+            <a href="{{ url_for('listar_alunos') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </div>
+
+    <!-- Dados do Aluno -->
+    <div class="row">
+        <!-- Dados Básicos -->
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body text-center">
+                    {% if aluno.foto %}
+                    <img src="{{ url_for('static', filename=aluno.foto) }}" 
+                         alt="Foto do aluno" 
+                         class="rounded-circle mb-3"
+                         style="width: 150px; height: 150px; object-fit: cover; border: 3px solid #dc3545;">
+                    {% else %}
+                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center mx-auto mb-3"
+                         style="width: 150px; height: 150px; font-size: 3rem; border: 3px solid #dc3545;">
+                        <i class="bi bi-person"></i>
+                    </div>
+                    {% endif %}
+                    <h4>{{ aluno.nome }}</h4>
+                    <p class="text-muted mb-0"><i class="bi bi-envelope"></i> {{ aluno.email }}</p>
+                    <p class="text-muted mb-0"><i class="bi bi-telephone"></i> {% if aluno.telefone %}{{ aluno.telefone }}{% else %}–{% endif %}</p>
+                    <span class="badge {% if aluno.status == 'ativo' %}bg-success{% else %}bg-danger{% endif %}">
+                        {{ aluno.status|title }}
+                    </span>
+                </div>
+            </div>
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Documentos Enviados</h5>
+                </div>
+                <div class="card-body">
+                    {% if documentos %}
+                    <ul class="list-group">
+                        {% for doc in documentos %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <a href="{{ url_for('static', filename=doc.caminho) }}" target="_blank">
+                                <i class="bi bi-file-earmark-text me-2"></i>{{ doc.nome_identificador or doc.caminho.split('/')[-1] }}
+                            </a>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-sm btn-outline-primary" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#editarDocumentoModal{{ loop.index0 }}">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#excluirDocumentoModal{{ loop.index0 }}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <div class="text-muted">Nenhum documento enviado.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Dados Detalhados -->
+        <div class="col-md-8">
+            <!-- Dados Pessoais -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Dados Pessoais</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">RG</label>
+                            <p>{{ aluno.rg }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">CPF</label>
+                            <p>{{ aluno.cpf }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Data de Nascimento</label>
+                            <p>{{ aluno.data_nascimento.strftime('%d/%m/%Y') }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Idade</label>
+                            <p>{{ aluno.idade }} anos</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Tipo Sanguíneo</label>
+                            <p>{{ aluno.tipo_sanguineo }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Nome da Mãe</label>
+                            <p>{{ aluno.nome_mae }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Nome do Pai</label>
+                            <p>{{ aluno.nome_pai or 'Não informado' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dados do Responsável -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Dados do Responsável</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Nome</label>
+                            <p>{{ aluno.responsavel_nome }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">CPF</label>
+                            <p>{{ aluno.responsavel_cpf }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Telefone</label>
+                            <p>{{ aluno.responsavel_telefone }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Email</label>
+                            <p>{{ aluno.responsavel_email }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dados de Contato -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Dados de Contato</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Telefone</label>
+                            <p>{{ aluno.telefone }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Telefone de Emergência</label>
+                            <p>{{ aluno.telefone_emergencia or 'Não informado' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dados de Saúde -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Dados de Saúde</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Alergias</label>
+                            <p>{{ aluno.alergias or 'Não informado' }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Medicamentos em Uso</label>
+                            <p>{{ aluno.medicamentos or 'Não informado' }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Plano de Saúde</label>
+                            <p>{{ aluno.plano_saude or 'Não informado' }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Número do Plano de Saúde</label>
+                            <p>{{ aluno.numero_plano_saude or 'Não informado' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modais de Edição e Exclusão de Documentos -->
+{% for doc in documentos %}
+<!-- Modal de Edição -->
+<div class="modal fade" id="editarDocumentoModal{{ loop.index0 }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Documento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('editar_documento', documento_id=loop.index0, aluno_id=aluno.id) }}" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nome do Documento</label>
+                        <input type="text" class="form-control" name="nome_identificador" 
+                               value="{{ doc.nome_identificador or doc.caminho.split('/')[-1] }}" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+            </div>
+        </div>
+    </div>
+
+<!-- Modal de Exclusão -->
+<div class="modal fade" id="excluirDocumentoModal{{ loop.index0 }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir este documento?</p>
+                <p class="text-muted">{{ doc.nome_identificador or doc.caminho.split('/')[-1] }}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form action="{{ url_for('excluir_documento', documento_id=loop.index0, aluno_id=aluno.id) }}" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+        </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block scripts %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $('#cpf').mask('000.000.000-00');
+        $('#responsavel_cpf').mask('000.000.000-00');
+        $('#responsavel_telefone').mask('(00) 00000-0000');
+});
+</script>
+{% endblock %} 

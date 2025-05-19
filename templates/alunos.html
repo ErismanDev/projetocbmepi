@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Alunos{% endblock %}
+
+{% block main_content %}
+<div class="container-fluid">
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="h3 mb-0">Alunos</h2>
+            <p class="text-muted">Gerencie os alunos do sistema</p>
+        </div>
+        <div>
+            <a href="{{ url_for('cadastrar_aluno') }}" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i> Novo Aluno
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="mb-3">
+        <div class="btn-group" role="group">
+            <a href="{{ url_for('listar_alunos', status='todos') }}" class="btn btn-outline-secondary {% if status_filtro == 'todos' %}active{% endif %}">Todos</a>
+            <a href="{{ url_for('listar_alunos', status='ativo') }}" class="btn btn-outline-secondary {% if status_filtro == 'ativo' %}active{% endif %}">Ativos</a>
+            <a href="{{ url_for('listar_alunos', status='inativo') }}" class="btn btn-outline-secondary {% if status_filtro == 'inativo' %}active{% endif %}">Inativos</a>
+        </div>
+    </div>
+
+    <!-- Alertas -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ 'success' if category == 'success' else 'info' }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Lista Simples de Alunos -->
+    <div class="list-group">
+        {% for aluno in alunos %}
+        <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+            <div class="d-flex align-items-center">
+                {% if aluno.foto %}
+                    <img src="{{ url_for('static', filename=aluno.foto) }}" alt="Foto do Aluno" class="rounded-circle me-3" style="width: 48px; height: 48px; object-fit: cover;">
+                {% else %}
+                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                        <i class="bi bi-person"></i>
+                    </div>
+                {% endif %}
+                <div>
+                    <strong class="fs-5">{{ aluno.nome }}</strong><br>
+                    <span class="badge bg-light text-dark mt-1 mb-1" style="font-size: 0.95em;">
+                        Responsável: {{ aluno.responsavel_nome }} {% if aluno.responsavel_telefone %}- {{ aluno.responsavel_telefone }}{% endif %}
+                    </span>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <form action="{{ url_for('alterar_status_aluno', aluno_id=aluno.id) }}" method="POST" class="mb-0">
+                    <button type="submit" class="btn btn-sm {% if aluno.status == 'ativo' %}btn-danger{% else %}btn-success{% endif %}">
+                        {% if aluno.status == 'ativo' %}Desativar{% else %}Ativar{% endif %}
+                    </button>
+                </form>
+                <a href="{{ url_for('editar_aluno', aluno_id=aluno.id) }}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-pencil"></i> Editar
+                </a>
+                <a href="{{ url_for('detalhes_aluno', aluno_id=aluno.id) }}" class="btn btn-sm btn-info">
+                    <i class="bi bi-person-lines-fill"></i> Detalhes
+                </a>
+            </div>
+        </div>
+        {% else %}
+        <div class="list-group-item text-center">Nenhum aluno encontrado.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+{% endblock %} 

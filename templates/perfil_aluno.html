@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Meu Perfil{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="card-title">Meu Perfil</h2>
+                    <a href="{{ url_for('logout_aluno') }}" class="btn btn-outline-danger">Sair</a>
+                </div>
+
+                <!-- Foto -->
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="text-center mb-3">
+                            <img src="{{ url_for('static', filename=aluno.foto) if aluno.foto else url_for('static', filename='img/default_profile.svg') }}" 
+                                 alt="Minha Foto" 
+                                 class="rounded-circle" 
+                                 style="width: 150px; height: 150px; object-fit: cover; border: 2px solid #ff4444;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dados Pessoais -->
+                <h4 class="mb-3">Dados Pessoais</h4>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Nome Completo</label>
+                        <p>{{ aluno.nome }}</p>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label fw-bold">Data de Nascimento</label>
+                        <p>{{ aluno.data_nascimento.strftime('%d/%m/%Y') }}</p>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label fw-bold">Idade</label>
+                        <p>{{ aluno.idade }} anos</p>
+                    </div>
+                </div>
+
+                <!-- Dados do Responsável -->
+                <h4 class="mt-4 mb-3">Dados do Responsável</h4>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Nome do Responsável</label>
+                        <p>{{ aluno.responsavel }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Contatos</label>
+                        <p>Principal: {{ aluno.contato }}<br>
+                           Emergência: {{ aluno.contato_emergencia }}</p>
+                    </div>
+                </div>
+
+                <!-- Informações Médicas -->
+                <h4 class="mt-4 mb-3">Informações Médicas</h4>
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label fw-bold">Tipo Sanguíneo</label>
+                        <p>{{ aluno.tipo_sanguineo or '-' }}</p>
+                    </div>
+                    <div class="col-md-9 mb-3">
+                        <label class="form-label fw-bold">Plano de Saúde</label>
+                        <p>{{ aluno.plano_saude or '-' }}{% if aluno.numero_plano_saude %} ({{ aluno.numero_plano_saude }}){% endif %}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Alergias</label>
+                        <p>{{ aluno.alergias or 'Nenhuma alergia registrada' }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Medicamentos de Uso Contínuo</label>
+                        <p>{{ aluno.medicamentos or 'Nenhum medicamento registrado' }}</p>
+                    </div>
+                </div>
+
+                <!-- Histórico de Atividades -->
+                <h4 class="mt-4 mb-3">Minhas Atividades</h4>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Atividade</th>
+                                <th>Instrutor</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for participacao in participacoes %}
+                            <tr>
+                                <td>{{ participacao.atividade.data.strftime('%d/%m/%Y') }}</td>
+                                <td>{{ participacao.atividade.titulo }}</td>
+                                <td>{{ participacao.atividade.instrutor.nome }}</td>
+                                <td>
+                                    <span class="badge {% if participacao.presente %}bg-success{% else %}bg-danger{% endif %}">
+                                        {{ 'Presente' if participacao.presente else 'Ausente' }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

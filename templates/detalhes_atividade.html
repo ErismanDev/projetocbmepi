@@ -1,0 +1,142 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Detalhes da Atividade{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="h3 mb-0">Detalhes da Atividade</h2>
+            <p class="text-muted">{{ atividade.titulo }}</p>
+        </div>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <!-- Alertas -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Detalhes da Atividade -->
+    <div class="row">
+    <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Informações Gerais</h5>
+                </div>
+            <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong>Título:</strong></p>
+                            <p>{{ atividade.titulo }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong>Data:</strong></p>
+                            <p>{{ atividade.data.strftime('%d/%m/%Y') }}</p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong>Status:</strong></p>
+                            <p>
+                                <span class="badge {% if atividade.status == 'pendente' %}bg-warning{% else %}bg-success{% endif %}">
+                                    {{ atividade.status|title }}
+                                </span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong>Instrutor Responsável:</strong></p>
+                            <p>{{ atividade.instrutor.nome }}</p>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <p class="mb-1"><strong>Descrição:</strong></p>
+                        <p>{{ atividade.descricao }}</p>
+                    </div>
+                </div>
+                        </div>
+                    </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Ações</h5>
+                </div>
+                <div class="card-body">
+                    {% if atividade.status == 'pendente' %}
+                    <form action="{{ url_for('executar_atividade', atividade_id=atividade.id) }}" method="POST" class="mb-3">
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="bi bi-check-lg"></i> Marcar como Executada
+                        </button>
+                </form>
+                    {% endif %}
+                    
+                    {% if current_user.tipo == 'admin' %}
+                    <button type="button" class="btn btn-warning w-100 mb-3" data-bs-toggle="modal" data-bs-target="#editarAtividadeModal">
+                        <i class="bi bi-pencil"></i> Editar Atividade
+                    </button>
+                    {% endif %}
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if current_user.tipo == 'admin' %}
+<!-- Modal Editar Atividade -->
+<div class="modal fade" id="editarAtividadeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Atividade</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('atualizar_atividade', atividade_id=atividade.id) }}" method="POST">
+            <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Título</label>
+                        <input type="text" class="form-control" name="titulo" value="{{ atividade.titulo }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Descrição</label>
+                        <textarea class="form-control" name="descricao" rows="3" required>{{ atividade.descricao }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Data</label>
+                        <input type="date" class="form-control" name="data" value="{{ atividade.data.strftime('%Y-%m-%d') }}" required>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Salvar Alterações</button>
+                </div>
+                </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Definir data mínima como hoje para edição de atividade
+document.addEventListener('DOMContentLoaded', function() {
+    const dataInput = document.querySelector('input[name="data"]');
+    if (dataInput) {
+        const hoje = new Date().toISOString().split('T')[0];
+        dataInput.min = hoje;
+    }
+});
+</script>
+{% endblock %} 

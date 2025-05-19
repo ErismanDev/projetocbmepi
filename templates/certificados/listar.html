@@ -1,0 +1,103 @@
+{% extends "base_dashboard.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Certificados</h2>
+        {% if session.get('usuario_tipo') == 'admin' %}
+        <a href="{{ url_for('novo_certificado') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Novo Certificado
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Aluno</th>
+                            <th>Curso</th>
+                            <th>Data de Emissão</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for certificado in certificados %}
+                        <tr>
+                            <td>{{ certificado.aluno.nome }}</td>
+                            <td>{{ certificado.curso.nome }}</td>
+                            <td>{{ certificado.data_emissao.strftime('%d/%m/%Y') }}</td>
+                            <td>
+                                {% if certificado.status == 'emitido' %}
+                                <span class="badge bg-success">Emitido</span>
+                                {% elif certificado.status == 'pendente' %}
+                                <span class="badge bg-warning">Pendente</span>
+                                {% else %}
+                                <span class="badge bg-danger">Cancelado</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('visualizar_certificado', certificado_id=certificado.id) }}" class="btn btn-sm btn-info">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    {% if certificado.status == 'emitido' %}
+                                    <a href="{{ url_for('baixar_certificado', certificado_id=certificado.id) }}" class="btn btn-sm btn-success">
+                                        <i class="bi bi-download"></i>
+                                    </a>
+                                    {% endif %}
+                                    {% if session.get('usuario_tipo') == 'admin' %}
+                                    <a href="{{ url_for('editar_certificado', certificado_id=certificado.id) }}" class="btn btn-sm btn-warning">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-danger" onclick="confirmarExclusao('{{ certificado.id }}')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Exclusão -->
+<div class="modal fade" id="modalExclusao" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Tem certeza que deseja excluir este certificado?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formExclusao" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function confirmarExclusao(certificadoId) {
+    const modal = new bootstrap.Modal(document.getElementById('modalExclusao'));
+    const form = document.getElementById('formExclusao');
+    form.action = `/certificados/${certificadoId}/excluir`;
+    modal.show();
+}
+</script>
+{% endblock %} 

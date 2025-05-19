@@ -1,0 +1,117 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Disciplinas da Turma - {{ turma.nome }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('listar_turmas') }}">Turmas</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('detalhes_turma', turma_id=turma.id) }}">{{ turma.nome }}</a></li>
+                    <li class="breadcrumb-item active">Disciplinas</li>
+                </ol>
+            </nav>
+            <h2 class="h3 mb-0">Gerenciar Disciplinas</h2>
+            <p class="text-muted">Selecione as disciplinas para esta turma</p>
+        </div>
+    </div>
+
+    <!-- Alertas -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form action="{{ url_for('gerenciar_disciplinas_turma', turma_id=turma.id) }}" method="POST">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 50px;"></th>
+                                        <th>Disciplina</th>
+                                        <th>Carga Horária</th>
+                                        <th>Instrutor</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for disciplina in todas_disciplinas %}
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input type="checkbox" 
+                                                       class="form-check-input" 
+                                                       name="disciplinas" 
+                                                       value="{{ disciplina.id }}"
+                                                       id="disciplina_{{ disciplina.id }}"
+                                                       {% if disciplina in turma.disciplinas %}checked{% endif %}>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <label for="disciplina_{{ disciplina.id }}" class="form-check-label">
+                                                {{ disciplina.nome }}
+                                            </label>
+                                        </td>
+                                        <td>{{ disciplina.carga_horaria }}h</td>
+                                        <td>{{ disciplina.instrutor.nome if disciplina.instrutor else 'Não atribuído' }}</td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="4" class="text-center">
+                                            Nenhuma disciplina disponível para este curso.
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="d-flex justify-content-end mt-3">
+                            <a href="{{ url_for('detalhes_turma', turma_id=turma.id) }}" class="btn btn-secondary me-2">Cancelar</a>
+                            <button type="submit" class="btn btn-danger">Salvar Alterações</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Informações da Turma</h5>
+                    <p class="card-text">
+                        <strong>Curso:</strong><br>
+                        {{ turma.curso.nome }}
+                    </p>
+                    <p class="card-text">
+                        <strong>Período:</strong><br>
+                        {{ turma.data_inicio.strftime('%d/%m/%Y') }} a {{ turma.data_fim.strftime('%d/%m/%Y') }}
+                    </p>
+                    <p class="card-text">
+                        <strong>Instrutor Principal:</strong><br>
+                        {{ turma.instrutor.nome }}
+                    </p>
+                    <p class="card-text mb-0">
+                        <strong>Status:</strong><br>
+                        <span class="badge {% if turma.status == 'ativa' %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ turma.status | title }}
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

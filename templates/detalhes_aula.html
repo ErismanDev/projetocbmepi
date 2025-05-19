@@ -1,0 +1,377 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Detalhes da Aula - {{ aula.disciplina.nome }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('listar_turmas') }}">Turmas</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('detalhes_turma', turma_id=aula.turma.id) }}">{{ aula.turma.nome }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('listar_aulas', turma_id=aula.turma.id) }}">Aulas</a></li>
+                    <li class="breadcrumb-item active">{{ aula.data.strftime('%d/%m/%Y') }}</li>
+                </ol>
+            </nav>
+            <h2 class="h3 mb-0">Detalhes da Aula</h2>
+            <p class="text-muted">{{ aula.disciplina.nome }} - {{ aula.data.strftime('%d/%m/%Y %H:%M') }}</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editarAula">
+                <i class="bi bi-pencil"></i> Editar Aula
+            </button>
+            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#registrarPresenca">
+                <i class="bi bi-check2-square"></i> Registrar Presenças
+            </button>
+        </div>
+    </div>
+
+    <!-- Alertas -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Detalhes da Aula -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Informações da Aula</h5>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong>Disciplina:</strong></p>
+                            <p>{{ aula.disciplina.nome }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong>Instrutor:</strong></p>
+                            <p>{{ aula.instrutor.nome }}</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <p class="mb-1"><strong>Conteúdo:</strong></p>
+                        <p class="mb-0">{{ aula.conteudo }}</p>
+                    </div>
+
+                    {% if aula.observacoes %}
+                    <div class="mb-4">
+                        <p class="mb-1"><strong>Observações:</strong></p>
+                        <p class="mb-0">{{ aula.observacoes }}</p>
+                    </div>
+                    {% endif %}
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <p class="mb-1"><strong>Data:</strong></p>
+                            <p>{{ aula.data.strftime('%d/%m/%Y') }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="mb-1"><strong>Horário:</strong></p>
+                            <p>{{ aula.data.strftime('%H:%M') }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="mb-1"><strong>Status:</strong></p>
+                            <p>
+                                <span class="badge {% if aula.status == 'realizada' %}bg-success
+                                                 {% elif aula.status == 'cancelada' %}bg-danger
+                                                 {% else %}bg-warning{% endif %}">
+                                    {{ aula.status | title }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Presenças -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">Lista de Presenças</h5>
+                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#registrarPresenca">
+                            Atualizar Presenças
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Aluno</th>
+                                    <th>Presença</th>
+                                    <th>Justificativa</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for presenca in aula.presencas %}
+                                <tr>
+                                    <td>{{ presenca.aluno.nome }}</td>
+                                    <td>
+                                        <span class="badge {% if presenca.presente %}bg-success{% else %}bg-danger{% endif %}">
+                                            {{ 'Presente' if presenca.presente else 'Ausente' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if presenca.justificativa %}
+                                        <small class="text-muted">{{ presenca.justificativa }}</small>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center">
+                                        Nenhuma presença registrada.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <!-- Estatísticas -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Estatísticas</h5>
+                    
+                    {% set total_alunos = aula.presencas|length %}
+                    {% set total_presentes = aula.presencas|selectattr('presente')|list|length %}
+                    {% set percentual_presenca = (total_presentes / total_alunos * 100)|round if total_alunos > 0 else 0 %}
+                    
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="flex-shrink-0">
+                            <div class="rounded-circle bg-success bg-opacity-10 p-3">
+                                <i class="bi bi-person-check text-success fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="mb-0">{{ total_presentes }} / {{ total_alunos }}</h6>
+                            <small class="text-muted">Alunos Presentes</small>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="rounded-circle bg-info bg-opacity-10 p-3">
+                                <i class="bi bi-percent text-info fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="mb-0">{{ percentual_presenca }}%</h6>
+                            <small class="text-muted">Taxa de Presença</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informações da Disciplina -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Informações da Disciplina</h5>
+                    <p class="card-text">
+                        <strong>Nome:</strong><br>
+                        {{ aula.disciplina.nome }}
+                    </p>
+                    <p class="card-text">
+                        <strong>Carga Horária:</strong><br>
+                        {{ aula.disciplina.carga_horaria }}h
+                    </p>
+                    <p class="card-text mb-0">
+                        <strong>Instrutor Responsável:</strong><br>
+                        {{ aula.disciplina.instrutor.nome if aula.disciplina.instrutor else 'Não atribuído' }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Registro de Presenças -->
+    <div class="modal fade" id="registrarPresenca" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Registrar Presenças</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="{{ url_for('registrar_presenca_aula', aula_id=aula.id) }}" method="POST">
+                    <div class="modal-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 50px;">
+                                            <div class="form-check">
+                                                <input type="checkbox" 
+                                                       class="form-check-input" 
+                                                       id="selectAllPresencas"
+                                                       onchange="toggleAllPresencas()">
+                                            </div>
+                                        </th>
+                                        <th>Aluno</th>
+                                        <th>Justificativa (se ausente)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for presenca in aula.presencas %}
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input type="checkbox" 
+                                                       class="form-check-input presenca-checkbox" 
+                                                       name="presenca_{{ presenca.aluno.id }}"
+                                                       id="presenca_{{ presenca.aluno.id }}"
+                                                       {% if presenca.presente %}checked{% endif %}
+                                                       onchange="toggleJustificativa({{ presenca.aluno.id }})">
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <label for="presenca_{{ presenca.aluno.id }}" class="form-check-label">
+                                                {{ presenca.aluno.nome }}
+                                            </label>
+                                        </td>
+                                        <td>
+                                            <input type="text" 
+                                                   class="form-control form-control-sm justificativa" 
+                                                   name="justificativa_{{ presenca.aluno.id }}"
+                                                   id="justificativa_{{ presenca.aluno.id }}"
+                                                   value="{{ presenca.justificativa }}"
+                                                   {% if presenca.presente %}disabled{% endif %}>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger">Salvar Presenças</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Edição da Aula -->
+    <div class="modal fade" id="editarAula" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Aula</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="{{ url_for('atualizar_aula', aula_id=aula.id) }}" method="POST">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Disciplina</label>
+                            <select class="form-select" name="disciplina_id" required>
+                                {% for disciplina in aula.turma.disciplinas %}
+                                <option value="{{ disciplina.id }}" {% if disciplina.id == aula.disciplina_id %}selected{% endif %}>
+                                    {{ disciplina.nome }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Instrutor</label>
+                            <select class="form-select" name="instrutor_id" required>
+                                {% for instrutor in instrutores %}
+                                <option value="{{ instrutor.id }}" {% if instrutor.id == aula.instrutor_id %}selected{% endif %}>
+                                    {{ instrutor.nome }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Data</label>
+                                    <input type="date" 
+                                           class="form-control" 
+                                           name="data" 
+                                           value="{{ aula.data.strftime('%Y-%m-%d') }}"
+                                           required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Hora</label>
+                                    <input type="time" 
+                                           class="form-control" 
+                                           name="hora" 
+                                           value="{{ aula.data.strftime('%H:%M') }}"
+                                           required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Conteúdo da Aula</label>
+                            <textarea class="form-control" name="conteudo" rows="3" required>{{ aula.conteudo }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Observações</label>
+                            <textarea class="form-control" name="observacoes" rows="2">{{ aula.observacoes }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status" required>
+                                <option value="realizada" {% if aula.status == 'realizada' %}selected{% endif %}>Realizada</option>
+                                <option value="cancelada" {% if aula.status == 'cancelada' %}selected{% endif %}>Cancelada</option>
+                                <option value="remarcada" {% if aula.status == 'remarcada' %}selected{% endif %}>Remarcada</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+function toggleAllPresencas() {
+    var checkboxes = document.getElementsByClassName('presenca-checkbox');
+    var selectAll = document.getElementById('selectAllPresencas');
+    
+    for (var checkbox of checkboxes) {
+        checkbox.checked = selectAll.checked;
+        toggleJustificativa(checkbox.id.split('_')[1]);
+    }
+}
+
+function toggleJustificativa(alunoId) {
+    var presenca = document.getElementById('presenca_' + alunoId);
+    var justificativa = document.getElementById('justificativa_' + alunoId);
+    
+    if (presenca.checked) {
+        justificativa.disabled = true;
+        justificativa.value = '';
+    } else {
+        justificativa.disabled = false;
+    }
+}
+</script>
+{% endblock %}
+{% endblock %} 

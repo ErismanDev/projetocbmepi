@@ -1,0 +1,52 @@
+{% extends "base_dashboard.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Nova Matrícula</h1>
+    {% if session.get('usuario_tipo') == 'admin' or session.get('usuario_tipo') == 'instrutor' %}
+    <form method="POST" action="{{ url_for('nova_matricula') }}">
+        <div class="form-group">
+            <label for="aluno_id">Aluno</label>
+            <select class="form-control" id="aluno_id" name="aluno_id" required>
+                <option value="">Selecione um aluno</option>
+                {% for aluno in alunos %}
+                <option value="{{ aluno.id }}">{{ aluno.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="turma_id">Turma</label>
+            <select class="form-control" id="turma_id" name="turma_id" required>
+                <option value="">Selecione uma turma</option>
+                {% for turma in turmas %}
+                <option value="{{ turma.id }}">{{ turma.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="status">Status</label>
+            <select class="form-control" id="status" name="status" required>
+                <option value="ativa">Ativa</option>
+                <option value="trancada">Trancada</option>
+                <option value="concluida">Concluída</option>
+                <option value="cancelada">Cancelada</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="data_matricula">Data de Matrícula</label>
+            <input type="date" class="form-control" id="data_matricula" name="data_matricula" required>
+        </div>
+        <div class="form-group">
+            <label for="observacoes">Observações</label>
+            <textarea class="form-control" id="observacoes" name="observacoes" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Salvar</button>
+        <a href="{{ url_for('listar_matriculas') }}" class="btn btn-secondary">Cancelar</a>
+    </form>
+    {% else %}
+    <div class="alert alert-danger">
+        Você não tem permissão para acessar esta página.
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

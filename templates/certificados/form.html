@@ -1,0 +1,60 @@
+{% extends "base_dashboard.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>{{ 'Editar' if certificado else 'Novo' }} Certificado</h2>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="POST">
+                <div class="mb-3">
+                    <label for="aluno_id" class="form-label">Aluno</label>
+                    <select class="form-select" id="aluno_id" name="aluno_id" required>
+                        <option value="">Selecione um aluno</option>
+                        {% for aluno in alunos %}
+                        <option value="{{ aluno.id }}" {% if certificado and certificado.aluno_id == aluno.id %}selected{% endif %}>
+                            {{ aluno.nome }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="curso_id" class="form-label">Curso</label>
+                    <select class="form-select" id="curso_id" name="curso_id" required>
+                        <option value="">Selecione um curso</option>
+                        {% for curso in cursos %}
+                        <option value="{{ curso.id }}" {% if certificado and certificado.curso_id == curso.id %}selected{% endif %}>
+                            {{ curso.nome }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="data_emissao" class="form-label">Data de Emissão</label>
+                    <input type="date" class="form-control" id="data_emissao" name="data_emissao" value="{{ certificado.data_emissao.strftime('%Y-%m-%d') if certificado else '' }}" required>
+                </div>
+
+                {% if certificado %}
+                <div class="mb-3">
+                    <label for="status" class="form-label">Status</label>
+                    <select class="form-select" id="status" name="status" required>
+                        <option value="pendente" {% if certificado.status == 'pendente' %}selected{% endif %}>Pendente</option>
+                        <option value="emitido" {% if certificado.status == 'emitido' %}selected{% endif %}>Emitido</option>
+                        <option value="cancelado" {% if certificado.status == 'cancelado' %}selected{% endif %}>Cancelado</option>
+                    </select>
+                </div>
+                {% endif %}
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{{ url_for('listar_certificados') }}" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

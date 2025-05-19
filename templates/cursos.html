@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}Cursos{% endblock %}
+
+{% block main_content %}
+<div class="container-fluid">
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="h3 mb-0">Cursos</h2>
+            <p class="text-muted">Lista de Cursos</p>
+        </div>
+        {% if session.get('usuario_tipo') == 'admin' or session.get('usuario_tipo') == 'instrutor' %}
+        <a href="{{ url_for('novo_curso') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Novo Curso
+        </a>
+        {% endif %}
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <!-- Alertas -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Lista de Cursos em Cards -->
+    <div class="row" style="height: 650px; overflow-y: auto;">
+        {% for curso in cursos %}
+        <div class="col-12 mb-2">
+            <div class="card h-100 shadow-sm p-3 d-flex flex-row align-items-center">
+                <!-- Ícone/avatar -->
+                <div class="text-center me-4">
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; font-size: 2rem;">
+                        <i class="bi bi-journal-bookmark"></i>
+                    </div>
+                    <div class="fw-bold mt-2">Curso</div>
+                </div>
+                <!-- Informações principais -->
+                <div class="flex-grow-1">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="mb-3">Informações Básicas</h6>
+                            <p class="mb-1"><strong>NOME:</strong> {{ curso.nome }}</p>
+                            <p class="mb-1"><strong>DESCRIÇÃO:</strong> {{ curso.descricao }}</p>
+                            <p class="mb-1"><strong>CARGA HORÁRIA:</strong> {{ curso.carga_horaria or '-' }} horas</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="mb-3">Status e Detalhes</h6>
+                            <p class="mb-1"><strong>STATUS:</strong> <span class="badge {% if curso.status == 'ativo' %}bg-success{% else %}bg-danger{% endif %}">{{ curso.status | title }}</span></p>
+                            <p class="mb-1"><strong>REQUISITOS:</strong> {{ curso.requisitos or '-' }}</p>
+                            <div class="d-flex align-items-center gap-2 mt-2">
+                                <a href="{{ url_for('detalhes_curso', curso_id=curso.id) }}" class="btn btn-sm btn-success">
+                                    <i class="bi bi-gear"></i> Gerenciar
+                                </a>
+                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#detalhesCurso{{ curso.id }}">
+                                    <i class="bi bi-eye"></i> Detalhes
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#editarCurso{{ curso.id }}">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Detalhes -->
+        <div class="modal fade" id="detalhesCurso{{ curso.id }}" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Detalhes do Curso</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="mb-3">Informações Gerais</h6>
+                                <p><strong>Nome:</strong> {{ curso.nome }}</p>
+                                <p><strong>Descrição:</strong> {{ curso.descricao }}</p>
+                                <p><strong>Carga Horária:</strong> {{ curso.carga_horaria or 'Não informado' }} horas</p>
+                                <p><strong>Status:</strong> {{ curso.status | title }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="mb-3">Detalhes Adicionais</h6>
+                                <p><strong>Requisitos:</strong> {{ curso.requisitos or 'Não informado' }}</p>
+                                <p><strong>Objetivos:</strong> {{ curso.objetivos or 'Não informado' }}</p>
+                                <p><strong>Metodologia:</strong> {{ curso.metodologia or 'Não informado' }}</p>
+                            </div>
+                        </div>
+                        {% if curso.disciplinas %}
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <h6 class="mb-3">Disciplinas</h6>
+                                <ul class="list-group">
+                                    {% for disciplina in curso.disciplinas %}
+                                    <li class="list-group-item">
+                                        {{ disciplina.nome }}
+                                        {% if disciplina.descricao %}
+                                        <small class="text-muted d-block">{{ disciplina.descricao }}</small>
+                                        {% endif %}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Edição -->
+        <div class="modal fade" id="editarCurso{{ curso.id }}" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Curso</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form action="{{ url_for('atualizar_curso', curso_id=curso.id) }}" method="POST">
+                        <div class="modal-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Nome</label>
+                                    <input type="text" class="form-control" name="nome" value="{{ curso.nome }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Carga Horária</label>
+                                    <input type="number" class="form-control" name="carga_horaria" value="{{ curso.carga_horaria }}">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <label class="form-label">Descrição</label>
+                                    <textarea class="form-control" name="descricao" rows="3">{{ curso.descricao }}</textarea>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Requisitos</label>
+                                    <textarea class="form-control" name="requisitos" rows="2">{{ curso.requisitos }}</textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Status</label>
+                                    <select class="form-select" name="status">
+                                        <option value="ativo" {% if curso.status == 'ativo' %}selected{% endif %}>Ativo</option>
+                                        <option value="inativo" {% if curso.status == 'inativo' %}selected{% endif %}>Inativo</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-danger">Salvar Alterações</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+{% endblock %} 

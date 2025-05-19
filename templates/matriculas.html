@@ -1,0 +1,62 @@
+{% extends "base_dashboard.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Matrículas</h1>
+    
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Turmas Disponíveis</h6>
+        </div>
+        <div class="card-body">
+            {% if turmas %}
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Turma</th>
+                            <th>Curso</th>
+                            <th>Instrutor</th>
+                            <th>Data Início</th>
+                            <th>Data Fim</th>
+                            <th>Turno</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for turma in turmas %}
+                        <tr>
+                            <td>{{ turma.nome }}</td>
+                            <td>{{ turma.curso.nome }}</td>
+                            <td>{{ turma.instrutor.nome }}</td>
+                            <td>{{ turma.data_inicio.strftime('%d/%m/%Y') }}</td>
+                            <td>{{ turma.data_fim.strftime('%d/%m/%Y') }}</td>
+                            <td>{{ turma.turno }}</td>
+                            <td>
+                                <span class="badge badge-{{ 'success' if turma.status == 'ativa' else 'secondary' }}">
+                                    {{ turma.status }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('matriculas_turma', turma_id=turma.id) }}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-users"></i> Matrículas
+                                </a>
+                                <a href="{{ url_for('diario_classe', turma_id=turma.id) }}" class="btn btn-info btn-sm">
+                                    <i class="fas fa-book"></i> Diário
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                Nenhuma turma disponível para matrículas.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

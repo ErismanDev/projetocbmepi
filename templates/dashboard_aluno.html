@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block title %}Área do Aluno{% endblock %}
+
+{% block main_content %}
+<!-- Cabeçalho -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2">Dashboard</h1>
+</div>
+
+<!-- Card de Detalhes do Aluno -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card bg-light">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 text-center">
+                        {% if aluno.foto %}
+                        <img src="{{ url_for('static', filename=aluno.foto) }}" 
+                             alt="Foto do aluno" 
+                             class="rounded-circle mb-3"
+                             style="width: 150px; height: 150px; object-fit: cover;">
+                        {% else %}
+                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center mx-auto mb-3"
+                             style="width: 150px; height: 150px; font-size: 3rem;">
+                            <i class="bi bi-person"></i>
+                        </div>
+                        {% endif %}
+                        <h4>{{ aluno.nome }}</h4>
+                        <p class="text-muted mb-0">
+                            <i class="bi bi-envelope"></i> {{ aluno.email }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            <i class="bi bi-telephone"></i> {{ aluno.telefone or '-' }}
+                        </p>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">RG</label>
+                                <p>{{ aluno.rg }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">CPF</label>
+                                <p>{{ aluno.cpf }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Data de Nascimento</label>
+                                <p>{{ aluno.data_nascimento.strftime('%d/%m/%Y') }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Idade</label>
+                                <p>{{ aluno.idade }} anos</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Tipo Sanguíneo</label>
+                                <p>{{ aluno.tipo_sanguineo or '-' }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Status</label>
+                                <p>
+                                    <span class="badge {% if aluno.status == 'ativo' %}bg-success{% else %}bg-danger{% endif %}">
+                                        {{ aluno.status|title }}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end mt-3">
+                            <a href="{{ url_for('detalhes_aluno', aluno_id=aluno.id) }}" class="btn btn-info">
+                                <i class="bi bi-person-lines-fill"></i> Ver Meus Dados Completos
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cards de Estatísticas -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card bg-primary text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-0">Total de Atividades</h6>
+                        <h2 class="mt-2 mb-0">{{ total_atividades }}</h2>
+                    </div>
+                    <i class="bi bi-calendar-check fs-1"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-success text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-0">Presenças</h6>
+                        <h2 class="mt-2 mb-0">{{ total_presencas }}</h2>
+                    </div>
+                    <i class="bi bi-check-circle fs-1"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-info text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-0">Minhas Turmas</h6>
+                        <h2 class="mt-2 mb-0">{{ turmas|length }}</h2>
+                    </div>
+                    <i class="bi bi-mortarboard fs-1"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Próximas Atividades -->
+    <div class="col-md-6 mb-4" id="proximas">
+        <div class="card h-100">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Próximas Atividades</h5>
+            </div>
+            <div class="card-body">
+                {% if proximas_atividades %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Título</th>
+                                <th>Instrutor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for atividade in proximas_atividades %}
+                            <tr>
+                                <td>{{ atividade.data.strftime('%d/%m/%Y') }}</td>
+                                <td>{{ atividade.titulo }}</td>
+                                <td>{{ atividade.instrutor.nome }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center mb-0">Não há atividades programadas.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Minhas Turmas -->
+    <div class="col-md-6 mb-4" id="turmas">
+        <div class="card h-100">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Minhas Turmas</h5>
+            </div>
+            <div class="card-body">
+                {% if turmas %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Turma</th>
+                                <th>Curso</th>
+                                <th>Instrutor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for turma in turmas %}
+                            <tr>
+                                <td>{{ turma.nome }}</td>
+                                <td>{{ turma.curso.nome }}</td>
+                                <td>{{ turma.instrutor.nome }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center mb-0">Você ainda não está matriculado em nenhuma turma.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Histórico de Atividades -->
+<div class="row">
+    <div class="col-12" id="historico">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Histórico de Atividades</h5>
+            </div>
+            <div class="card-body">
+                {% if participacoes %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Atividade</th>
+                                <th>Status</th>
+                                <th>Observação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for participacao in participacoes %}
+                            <tr>
+                                <td>{{ participacao.atividade.data.strftime('%d/%m/%Y') }}</td>
+                                <td>{{ participacao.atividade.titulo }}</td>
+                                <td>
+                                    <span class="badge {% if participacao.presente %}bg-success{% else %}bg-danger{% endif %}">
+                                        {{ 'Presente' if participacao.presente else 'Ausente' }}
+                                    </span>
+                                </td>
+                                <td>{{ participacao.observacao or '-' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center mb-0">Nenhuma atividade registrada ainda.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

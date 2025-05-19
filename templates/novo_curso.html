@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}Novo Curso{% endblock %}
+
+{% block main_content %}
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('listar_cursos') }}">Cursos</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Novo Curso</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white d-flex align-items-center">
+                    <i class="bi bi-book-plus-fill me-2 fs-4"></i>
+                    <h5 class="card-title mb-0">Novo Curso</h5>
+                </div>
+                <div class="card-body">
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                        {% for field, errors in form.errors.items() %}
+                            {% for error in errors %}
+                                <li><strong>{{ field|capitalize }}:</strong> {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    <form method="POST" class="needs-validation" novalidate>
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row g-3">
+                            <!-- Nome do Curso -->
+                            <div class="col-md-12">
+                                <div class="form-floating">
+                                    {{ form.nome(class="form-control", placeholder="Nome do Curso") }}
+                                    <label for="nome">Nome do Curso</label>
+                                    {% if form.nome.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.nome.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Descrição -->
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    {{ form.descricao(class="form-control", style="height: 100px", placeholder="Descrição") }}
+                                    <label for="descricao">Descrição</label>
+                                    {% if form.descricao.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.descricao.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Carga Horária -->
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.carga_horaria(class="form-control", type="number", placeholder="Carga Horária") }}
+                                    <label for="carga_horaria">Carga Horária (horas)</label>
+                                    {% if form.carga_horaria.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.carga_horaria.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Duração -->
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.duracao(class="form-control", type="number", placeholder="Duração") }}
+                                    <label for="duracao">Duração (meses)</label>
+                                    {% if form.duracao.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.duracao.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Requisitos -->
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    {{ form.requisitos(class="form-control", style="height: 100px", placeholder="Requisitos") }}
+                                    <label for="requisitos">Requisitos</label>
+                                    {% if form.requisitos.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.requisitos.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Status -->
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.status(class="form-select", placeholder="Status") }}
+                                    <label for="status">Status</label>
+                                    {% if form.status.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.status.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Observações -->
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    {{ form.observacoes(class="form-control", style="height: 100px", placeholder="Observações") }}
+                                    <label for="observacoes">Observações</label>
+                                    {% if form.observacoes.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.observacoes.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a href="{{ url_for('listar_cursos') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-2"></i>Salvar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+// Validação do formulário
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+</script>
+{% endblock %}
+
+{% endblock %} 

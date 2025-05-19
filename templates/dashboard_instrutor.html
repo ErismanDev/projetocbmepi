@@ -1,0 +1,339 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Área do Instrutor{% endblock %}
+
+{% block content %}
+<!-- Cabeçalho -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2">Dashboard</h1>
+</div>
+
+<!-- Cards de Estatísticas -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card bg-primary text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-0">Total de Alunos</h6>
+                        <h2 class="mt-2 mb-0">{{ total_alunos }}</h2>
+                    </div>
+                    <i class="bi bi-people fs-1"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-success text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-0">Atividades</h6>
+                        <h2 class="mt-2 mb-0">{{ total_atividades }}</h2>
+                    </div>
+                    <i class="bi bi-calendar-check fs-1"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-info text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-0">Turmas Ativas</h6>
+                        <h2 class="mt-2 mb-0">{{ total_turmas }}</h2>
+                    </div>
+                    <i class="bi bi-mortarboard fs-1"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Card de Cursos -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+            <i class="bi bi-book me-2"></i>
+            Cursos Disponíveis
+        </h5>
+        <a href="{{ url_for('listar_cursos') }}" class="btn btn-primary btn-sm">
+            <i class="bi bi-gear me-1"></i>
+            Gerenciar Cursos
+        </a>
+    </div>
+    <div class="card-body p-0">
+        {% if cursos %}
+            <div class="list-group list-group-flush">
+                {% for curso in cursos %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center p-3">
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-3">
+                                <i class="bi bi-book text-primary"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1">{{ curso.nome }}</h6>
+                                <small class="text-muted">
+                                    <i class="bi bi-clock me-1"></i>
+                                    {{ curso.carga_horaria }} horas
+                                    <i class="bi bi-calendar me-2 ms-2"></i>
+                                    {{ curso.duracao }} meses
+                                </small>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('detalhes_curso', curso_id=curso.id) }}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-eye me-1"></i>
+                            Ver Detalhes
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center p-4">
+                <p class="text-muted mb-0">Nenhum curso cadastrado.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Card de Aniversariantes do Mês -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+            <i class="bi bi-gift-fill me-2"></i>
+            Aniversariantes do Mês
+        </h5>
+        <span class="badge bg-warning text-dark">
+            {{ (aniversariantes.instrutores|length + aniversariantes.alunos|length) }} aniversariantes
+        </span>
+    </div>
+    <div class="card-body p-0">
+        {% if aniversariantes.instrutores or aniversariantes.alunos %}
+            <div class="list-group list-group-flush">
+                {% for instrutor in aniversariantes.instrutores %}
+                    <div class="list-group-item d-flex align-items-center p-3">
+                        <div class="d-flex align-items-center flex-grow-1">
+                            <div class="rounded-circle bg-danger bg-opacity-10 p-2 me-3">
+                                <i class="bi bi-gift-fill text-danger"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1">{{ instrutor.nome }}</h6>
+                                <small class="text-muted">
+                                    Instrutor • {{ (hoje.year - instrutor.data_nascimento.year) }} anos
+                                </small>
+                                {% if instrutor.data_nascimento %}
+                                    <br><small class="text-secondary">Data de Nascimento: {{ instrutor.data_nascimento.strftime('%d/%m/%Y') }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span class="badge bg-danger me-2">
+                                {{ instrutor.data_nascimento.strftime('%d/%m') }}
+                            </span>
+                            {% if instrutor.data_nascimento.day == hoje.day %}
+                                <span class="badge bg-warning text-dark">
+                                    <i class="bi bi-star-fill me-1"></i>
+                                    Hoje!
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+                
+                {% for aluno in aniversariantes.alunos %}
+                    <div class="list-group-item d-flex align-items-center p-3">
+                        <div class="d-flex align-items-center flex-grow-1">
+                            <div class="rounded-circle bg-danger bg-opacity-10 p-2 me-3">
+                                <i class="bi bi-gift-fill text-danger"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1">{{ aluno.nome }}</h6>
+                                <small class="text-muted">
+                                    Aluno • {{ aluno.idade }} anos
+                                </small>
+                                {% if aluno.data_nascimento %}
+                                    <br><small class="text-secondary">Data de Nascimento: {{ aluno.data_nascimento.strftime('%d/%m/%Y') }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span class="badge bg-danger me-2">
+                                {{ aluno.data_nascimento.strftime('%d/%m') }}
+                            </span>
+                            {% if aluno.data_nascimento.day == hoje.day %}
+                                <span class="badge bg-warning text-dark">
+                                    <i class="bi bi-star-fill me-1"></i>
+                                    Hoje!
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center p-4">
+                <i class="bi bi-calendar-x text-muted fs-1"></i>
+                <p class="text-muted mt-2 mb-0">
+                    Nenhum aniversariante este mês
+                </p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Atividades Pendentes -->
+<div class="col-md-6" id="proximas">
+    <div class="card h-100">
+        <div class="card-header bg-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Atividades Pendentes</h5>
+                {% if usuario.tipo == 'admin' %}
+                <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#novaAtividadeModal">
+                    <i class="bi bi-plus-lg"></i> Nova Atividade
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card-body">
+            {% if atividades_pendentes %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Título</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for atividade in atividades_pendentes %}
+                        <tr>
+                            <td>{{ atividade.data.strftime('%d/%m/%Y') }}</td>
+                            <td>{{ atividade.titulo }}</td>
+                            <td>
+                                <span class="badge bg-warning">Pendente</span>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('detalhes_atividade', atividade_id=atividade.id) }}" class="btn btn-sm btn-info text-white">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-center text-muted my-3">Não há atividades pendentes.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Atividades Executadas -->
+<div class="col-md-6" id="historico">
+    <div class="card h-100">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Atividades Executadas</h5>
+        </div>
+        <div class="card-body">
+            {% if atividades_executadas %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Título</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for atividade in atividades_executadas %}
+                        <tr>
+                            <td>{{ atividade.data.strftime('%d/%m/%Y') }}</td>
+                            <td>{{ atividade.titulo }}</td>
+                            <td>
+                                <span class="badge bg-success">Executada</span>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('detalhes_atividade', atividade_id=atividade.id) }}" class="btn btn-sm btn-info text-white">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-center text-muted my-3">Não há atividades executadas.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Minhas Turmas -->
+<div class="row mt-4">
+    <div class="col-12" id="turmas">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Minhas Turmas</h5>
+            </div>
+            <div class="card-body">
+                <!-- Turmas content -->
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if usuario.tipo == 'admin' %}
+<!-- Modal Nova Atividade -->
+<div class="modal fade" id="novaAtividadeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nova Atividade</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('nova_atividade') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="titulo" class="form-label">Título</label>
+                        <input type="text" class="form-control" id="titulo" name="titulo" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="descricao" class="form-label">Descrição</label>
+                        <textarea class="form-control" id="descricao" name="descricao" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="data" class="form-label">Data</label>
+                        <input type="date" class="form-control" id="data" name="data" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Criar Atividade</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Definir data mínima como hoje para nova atividade
+document.addEventListener('DOMContentLoaded', function() {
+    const dataInput = document.getElementById('data');
+    if (dataInput) {
+    const hoje = new Date().toISOString().split('T')[0];
+        dataInput.min = hoje;
+    }
+});
+</script>
+{% endblock %} 

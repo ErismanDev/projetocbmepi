@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block main_content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>Dashboard</h2>
+        <p>Bem-vindo, {{ session.get('usuario_nome') }}!</p>
+    </div>
+    <div class="col-auto">
+        {% if session.get('usuario_tipo') == 'admin' %}
+        <a href="{{ url_for('cadastrar_usuario') }}" class="btn btn-info me-2">Novo Usuário</a>
+        {% endif %}
+        <a href="{{ url_for('cadastrar_aluno') }}" class="btn btn-success me-2">Novo Aluno</a>
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#novaAtividadeModal">
+            Nova Atividade
+        </button>
+    </div>
+</div>
+
+<!-- Lista de Alunos -->
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="card-title mb-0">Alunos</h3>
+        <div class="btn-group">
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="mostrarAtivos">Ativos</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="mostrarInativos">Inativos</button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th style="width: 60px;"></th>
+                        <th>Nome</th>
+                        <th>CPF</th>
+                        <th>Idade</th>
+                        <th>Responsável</th>
+                        <th>Contato Principal</th>
+                        <th>Contato Emergência</th>
+                        <th>Tipo Sanguíneo</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for aluno in alunos %}
+                    <tr class="aluno-row {{ 'table-danger' if aluno.status == 'inativo' }}">
+                        <td>
+                            <img src="{{ url_for('static', filename=aluno.foto) if aluno.foto else url_for('static', filename='img/default_profile.svg') }}" 
+                                 alt="Foto de {{ aluno.nome }}" 
+                                 class="rounded-circle" 
+                                 style="width: 40px; height: 40px; object-fit: cover;">
+                        </td>
+                        <td>{{ aluno.nome }}</td>
+                        <td>{{ aluno.cpf }}</td>
+                        <td>{{ aluno.idade }}</td>
+                        <td>{{ aluno.responsavel }}</td>
+                        <td>{{ aluno.contato }}</td>
+                        <td>{{ aluno.contato_emergencia }}</td>
+                        <td>{{ aluno.tipo_sanguineo or '-' }}</td>
+                        <td>
+                            <span class="badge {{ 'bg-success' if aluno.status == 'ativo' else 'bg-danger' }}">
+                                {{ aluno.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('detalhes_aluno', aluno_id=aluno.id) }}" class="btn btn-sm btn-primary">
+                                Detalhes
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de Atividades -->
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title mb-0">Atividades</h3>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            {% for atividade in atividades %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ atividade.titulo }}</h5>
+                        <p class="card-text">{{ atividade.descricao }}</p>
+                        <p class="card-text">
+                            <small class="text-muted">Data: {{ atividade.data.strftime('%d/%m/%Y') }}</small>
+                        </p>
+                        <a href="{{ url_for('detalhes_atividade', atividade_id=atividade.id) }}" class="btn btn-primary btn-sm">
+                            Gerenciar Atividade
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal Nova Atividade -->
+<div class="modal fade" id="novaAtividadeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nova Atividade</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('nova_atividade') }}" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="titulo" class="form-label">Título</label>
+                        <input type="text" class="form-control" id="titulo" name="titulo" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="descricao" class="form-label">Descrição</label>
+                        <textarea class="form-control" id="descricao" name="descricao" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="data" class="form-label">Data</label>
+                        <input type="date" class="form-control" id="data" name="data" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('mostrarAtivos').addEventListener('click', function() {
+    const rows = document.querySelectorAll('.aluno-row');
+    rows.forEach(row => {
+        if (row.querySelector('.badge').textContent.trim() === 'ativo') {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+
+document.getElementById('mostrarInativos').addEventListener('click', function() {
+    const rows = document.querySelectorAll('.aluno-row');
+    rows.forEach(row => {
+        if (row.querySelector('.badge').textContent.trim() === 'inativo') {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+</script>
+{% endblock %} 

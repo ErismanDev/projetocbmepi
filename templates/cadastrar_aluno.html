@@ -1,0 +1,215 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Cadastrar Aluno{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('listar_alunos') }}">Alunos</a></li>
+                    <li class="breadcrumb-item active">Novo Aluno</li>
+                </ol>
+            </nav>
+            <h2 class="h3 mb-0">Novo Aluno</h2>
+            <p class="text-muted">Cadastre um novo aluno no sistema</p>
+                            </div>
+        <div>
+            <a href="{{ url_for('listar_alunos') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+                        </div>
+                    </div>
+
+    <!-- Formulário de Cadastro -->
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('cadastrar_aluno') }}" enctype="multipart/form-data">
+                    <!-- Dados Pessoais -->
+                        <h5 class="mb-3">Dados Pessoais</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="nome" class="form-label">Nome Completo</label>
+                            <input type="text" class="form-control" id="nome" name="nome" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        </div>
+
+                    <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="data_nascimento" class="form-label">Data de Nascimento</label>
+                                <input type="date" class="form-control" id="data_nascimento" name="data_nascimento" required>
+                            </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="rg" class="form-label">RG</label>
+                            <input type="text" class="form-control" id="rg" name="rg" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="cpf" class="form-label">CPF</label>
+                            <input type="text" class="form-control" id="cpf" name="cpf" required>
+                        </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nome_mae" class="form-label">Nome da Mãe</label>
+                                <input type="text" class="form-control" id="nome_mae" name="nome_mae" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="nome_pai" class="form-label">Nome do Pai</label>
+                                <input type="text" class="form-control" id="nome_pai" name="nome_pai">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                            <label for="tipo_sanguineo" class="form-label">Tipo Sanguíneo</label>
+                                <select class="form-select" id="tipo_sanguineo" name="tipo_sanguineo" required>
+                                <option value="">Selecione...</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                            </select>
+                        </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="foto" class="form-label">Foto</label>
+                                <input type="file" class="form-control" id="foto" name="foto" accept="image/*">
+                            </div>
+                    </div>
+
+                    <!-- Dados do Responsável -->
+                        <h5 class="mt-4 mb-3">Dados do Responsável</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                                <label for="responsavel_nome" class="form-label">Nome do Responsável</label>
+                                <input type="text" class="form-control" id="responsavel_nome" name="responsavel_nome" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                                <label for="responsavel_cpf" class="form-label">CPF do Responsável</label>
+                                <input type="text" class="form-control" id="responsavel_cpf" name="responsavel_cpf" required>
+                            </div>
+                        </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                                <label for="responsavel_telefone" class="form-label">Telefone do Responsável</label>
+                                <input type="text" class="form-control" id="responsavel_telefone" name="responsavel_telefone" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                                <label for="responsavel_email" class="form-label">Email do Responsável</label>
+                                <input type="email" class="form-control" id="responsavel_email" name="responsavel_email" required>
+                        </div>
+                    </div>
+
+                        <!-- Dados de Contato -->
+                        <h5 class="mt-4 mb-3">Dados de Contato</h5>
+                    <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="telefone" class="form-label">Telefone</label>
+                                <input type="text" class="form-control" id="telefone" name="telefone" required>
+                        </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="telefone_emergencia" class="form-label">Telefone de Emergência</label>
+                                <input type="text" class="form-control" id="telefone_emergencia" name="telefone_emergencia">
+                        </div>
+                        </div>
+
+                        <!-- Dados de Saúde -->
+                        <h5 class="mt-4 mb-3">Dados de Saúde</h5>
+                    <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="alergias" class="form-label">Alergias</label>
+                                <textarea class="form-control" id="alergias" name="alergias" rows="2"></textarea>
+                        </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="medicamentos" class="form-label">Medicamentos em Uso</label>
+                                <textarea class="form-control" id="medicamentos" name="medicamentos" rows="2"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="plano_saude" class="form-label">Plano de Saúde</label>
+                            <input type="text" class="form-control" id="plano_saude" name="plano_saude">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                                <label for="numero_plano_saude" class="form-label">Número do Plano de Saúde</label>
+                            <input type="text" class="form-control" id="numero_plano_saude" name="numero_plano_saude">
+                            </div>
+                        </div>
+
+                        <!-- Dados de Acesso -->
+                        <h5 class="mt-4 mb-3">Dados de Acesso</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="senha" class="form-label">Senha</label>
+                                <input type="password" class="form-control" id="senha" name="senha" required>
+                    </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="confirmar_senha" class="form-label">Confirmar Senha</label>
+                                <input type="password" class="form-control" id="confirmar_senha" name="confirmar_senha" required>
+                    </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="documentos" class="form-label">Documentos (PDF, imagens, etc)</label>
+                        <input type="file" class="form-control mb-2" id="documentos" name="documentos" multiple accept=".pdf,image/*">
+                        <div id="nomes-documentos"></div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Cadastrar Aluno
+                            </button>
+                    </div>
+                </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $('#cpf').mask('000.000.000-00');
+        $('#responsavel_cpf').mask('000.000.000-00');
+        $('#telefone').mask('(00) 00000-0000');
+        $('#telefone_emergencia').mask('(00) 00000-0000');
+        $('#responsavel_telefone').mask('(00) 00000-0000');
+});
+
+// Script para adicionar campos de nome identificador para cada arquivo selecionado
+const inputDocs = document.getElementById('documentos');
+const nomesDiv = document.getElementById('nomes-documentos');
+inputDocs.addEventListener('change', function() {
+    nomesDiv.innerHTML = '';
+    Array.from(this.files).forEach((file, idx) => {
+        const label = document.createElement('label');
+        label.innerText = `Nome identificador para "${file.name}":`;
+        label.className = 'form-label mt-2';
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = `nome_identificador_${idx}`;
+        input.className = 'form-control mb-2';
+        nomesDiv.appendChild(label);
+        nomesDiv.appendChild(input);
+    });
+});
+</script>
+{% endblock %} 

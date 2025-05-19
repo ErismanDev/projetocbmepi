@@ -1,0 +1,181 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Editar Usuário{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('listar_usuarios') }}">Usuários</a></li>
+                    <li class="breadcrumb-item active">Editar Usuário</li>
+                </ol>
+            </nav>
+            <h2 class="h3 mb-0">Editar Usuário</h2>
+            <p class="text-muted">Atualize os dados do usuário</p>
+        </div>
+        <div>
+            <a href="{{ url_for('listar_usuarios') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </div>
+
+    <!-- Alertas -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Formulário de Edição -->
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('editar_usuario', usuario_id=usuario.id) }}" enctype="multipart/form-data">
+                        <input type="hidden" name="status_filtro" value="{{ request.args.get('status', 'todos') }}">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nome" class="form-label">Nome Completo</label>
+                                <input type="text" class="form-control" id="nome" name="nome" value="{{ usuario.nome }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" value="{{ usuario.email }}" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="rg" class="form-label">RG</label>
+                                <input type="text" class="form-control" id="rg" name="rg" value="{{ usuario.rg }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="cpf" class="form-label">CPF</label>
+                                <input type="text" class="form-control" id="cpf" name="cpf" value="{{ usuario.cpf }}">
+                            </div>
+                        </div>
+
+                        <!-- Dados Pessoais -->
+                        <h5 class="mt-4 mb-3">Dados Pessoais</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="data_nascimento" class="form-label">Data de Nascimento</label>
+                                <input type="date" class="form-control" id="data_nascimento" name="data_nascimento" value="{{ usuario.data_nascimento.strftime('%Y-%m-%d') if usuario.data_nascimento else '' }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="tipo_sanguineo" class="form-label">Tipo Sanguíneo</label>
+                                <select class="form-select" id="tipo_sanguineo" name="tipo_sanguineo">
+                                    <option value="">Selecione...</option>
+                                    <option value="A+" {% if usuario.tipo_sanguineo == 'A+' %}selected{% endif %}>A+</option>
+                                    <option value="A-" {% if usuario.tipo_sanguineo == 'A-' %}selected{% endif %}>A-</option>
+                                    <option value="B+" {% if usuario.tipo_sanguineo == 'B+' %}selected{% endif %}>B+</option>
+                                    <option value="B-" {% if usuario.tipo_sanguineo == 'B-' %}selected{% endif %}>B-</option>
+                                    <option value="AB+" {% if usuario.tipo_sanguineo == 'AB+' %}selected{% endif %}>AB+</option>
+                                    <option value="AB-" {% if usuario.tipo_sanguineo == 'AB-' %}selected{% endif %}>AB-</option>
+                                    <option value="O+" {% if usuario.tipo_sanguineo == 'O+' %}selected{% endif %}>O+</option>
+                                    <option value="O-" {% if usuario.tipo_sanguineo == 'O-' %}selected{% endif %}>O-</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nome_mae" class="form-label">Nome da Mãe</label>
+                                <input type="text" class="form-control" id="nome_mae" name="nome_mae" value="{{ usuario.nome_mae }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="nome_pai" class="form-label">Nome do Pai</label>
+                                <input type="text" class="form-control" id="nome_pai" name="nome_pai" value="{{ usuario.nome_pai }}">
+                            </div>
+                        </div>
+
+                        <!-- Dados de Contato -->
+                        <h5 class="mt-4 mb-3">Dados de Contato</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="telefone" class="form-label">Telefone</label>
+                                <input type="text" class="form-control" id="telefone" name="telefone" value="{{ usuario.telefone }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="telefone_emergencia" class="form-label">Telefone de Emergência</label>
+                                <input type="text" class="form-control" id="telefone_emergencia" name="telefone_emergencia" value="{{ usuario.telefone_emergencia }}">
+                            </div>
+                        </div>
+
+                        <!-- Dados de Saúde -->
+                        <h5 class="mt-4 mb-3">Dados de Saúde</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="alergias" class="form-label">Alergias</label>
+                                <textarea class="form-control" id="alergias" name="alergias" rows="2">{{ usuario.alergias }}</textarea>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="medicamentos" class="form-label">Medicamentos em Uso</label>
+                                <textarea class="form-control" id="medicamentos" name="medicamentos" rows="2">{{ usuario.medicamentos }}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="plano_saude" class="form-label">Plano de Saúde</label>
+                                <input type="text" class="form-control" id="plano_saude" name="plano_saude" value="{{ usuario.plano_saude }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="numero_plano_saude" class="form-label">Número do Plano de Saúde</label>
+                                <input type="text" class="form-control" id="numero_plano_saude" name="numero_plano_saude" value="{{ usuario.numero_plano_saude }}">
+                            </div>
+                        </div>
+
+                        <!-- Dados do Sistema -->
+                        <h5 class="mt-4 mb-3">Dados do Sistema</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="tipo" class="form-label">Tipo</label>
+                                <select class="form-select" id="tipo" name="tipo" required>
+                                    <option value="admin" {% if usuario.tipo == 'admin' %}selected{% endif %}>Administrador</option>
+                                    <option value="instrutor" {% if usuario.tipo == 'instrutor' %}selected{% endif %}>Instrutor</option>
+                                    <option value="aluno" {% if usuario.tipo == 'aluno' %}selected{% endif %}>Aluno</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="status" class="form-label">Status</label>
+                                <select class="form-select" id="status" name="status" required>
+                                    <option value="ativo" {% if usuario.status == 'ativo' %}selected{% endif %}>Ativo</option>
+                                    <option value="inativo" {% if usuario.status == 'inativo' %}selected{% endif %}>Inativo</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Salvar Alterações
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $('#cpf').mask('000.000.000-00');
+        $('#telefone').mask('(00) 00000-0000');
+        $('#telefone_emergencia').mask('(00) 00000-0000');
+    });
+</script>
+{% endblock %} 

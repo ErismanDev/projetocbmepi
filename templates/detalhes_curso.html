@@ -1,0 +1,301 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}{{ curso.nome }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('listar_cursos') }}">Cursos</a></li>
+                    <li class="breadcrumb-item active">{{ curso.nome }}</li>
+                </ol>
+            </nav>
+            <h2 class="h3 mb-0">{{ curso.nome }}</h2>
+            <p class="text-muted">Detalhes do curso</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('listar_disciplinas', curso_id=curso.id) }}" class="btn btn-outline-primary">
+                <i class="bi bi-book"></i> Gerenciar Disciplinas
+            </a>
+            <button class="btn btn-primary" onclick="window.location='{{ url_for('detalhes_curso', curso_id=curso.id) }}?editar=1'">
+                <i class="bi bi-pencil"></i> Editar Curso
+            </button>
+        </div>
+    </div>
+
+    <!-- Alertas -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Detalhes do Curso -->
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Informações Gerais</h5>
+                    
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-2">Descrição</h6>
+                        <p>{{ curso.descricao }}</p>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6 class="text-muted mb-2">Carga Horária</h6>
+                            <p class="mb-0">{{ curso.carga_horaria }} horas</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-muted mb-2">Duração</h6>
+                            <p class="mb-0">{{ curso.duracao }} meses</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-muted mb-2">Status</h6>
+                            <p class="mb-0">
+                                <span class="badge {% if curso.status == 'ativo' %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {{ curso.status | title }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+
+                    {% if curso.requisitos %}
+                    <div class="mt-4">
+                        <h6 class="text-muted mb-2">Requisitos</h6>
+                        <p>{{ curso.requisitos }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if curso.observacoes %}
+                    <div class="mt-4">
+                        <h6 class="text-muted mb-2">Observações</h6>
+                        <p>{{ curso.observacoes }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Lista de Disciplinas -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">Disciplinas</h5>
+                        <a href="{{ url_for('listar_disciplinas', curso_id=curso.id) }}" class="btn btn-sm btn-outline-primary">
+                            Ver Todas
+                        </a>
+                    </div>
+
+                    {% if disciplinas %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Carga Horária</th>
+                                    <th>Instrutor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for disciplina in disciplinas %}
+                                <tr>
+                                    <td>{{ disciplina.nome }}</td>
+                                    <td>{{ disciplina.carga_horaria }}h</td>
+                                    <td>{{ disciplina.instrutor.nome if disciplina.instrutor else 'Não atribuído' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info mb-0">
+                        Nenhuma disciplina cadastrada.
+                        <a href="{{ url_for('listar_disciplinas', curso_id=curso.id) }}" class="alert-link">Adicionar disciplinas</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Lista de Turmas -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">Turmas</h5>
+                        <a href="{{ url_for('nova_turma') }}" class="btn btn-sm btn-outline-primary">
+                            Nova Turma
+                        </a>
+                    </div>
+
+                    {% if turmas %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Início</th>
+                                    <th>Término</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for turma in turmas %}
+                                <tr>
+                                    <td>{{ turma.nome }}</td>
+                                    <td>{{ turma.data_inicio.strftime('%d/%m/%Y') }}</td>
+                                    <td>{{ turma.data_fim.strftime('%d/%m/%Y') }}</td>
+                                    <td>
+                                        <span class="badge {% if turma.status == 'ativa' %}bg-success{% else %}bg-secondary{% endif %}">
+                                            {{ turma.status | title }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info mb-0">
+                        Nenhuma turma cadastrada.
+                        <a href="{{ url_for('nova_turma') }}" class="alert-link">Criar nova turma</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <!-- Estatísticas -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Estatísticas</h5>
+                    
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="flex-shrink-0">
+                            <div class="rounded-circle bg-primary bg-opacity-10 p-3">
+                                <i class="bi bi-book text-primary fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="mb-0">{{ disciplinas|length }}</h6>
+                            <small class="text-muted">Disciplinas</small>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="flex-shrink-0">
+                            <div class="rounded-circle bg-success bg-opacity-10 p-3">
+                                <i class="bi bi-people text-success fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="mb-0">{{ turmas|length }}</h6>
+                            <small class="text-muted">Turmas</small>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="rounded-circle bg-info bg-opacity-10 p-3">
+                                <i class="bi bi-clock text-info fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="mb-0">{{ curso.carga_horaria }}h</h6>
+                            <small class="text-muted">Carga Horária Total</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informações Adicionais -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Informações Adicionais</h5>
+                    
+                    <p class="mb-2">
+                        <strong>Criado em:</strong><br>
+                        {{ curso.created_at.strftime('%d/%m/%Y às %H:%M') }}
+                    </p>
+                    
+                    <p class="mb-0">
+                        <strong>Última atualização:</strong><br>
+                        {{ curso.updated_at.strftime('%d/%m/%Y às %H:%M') }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Edição -->
+    <div class="modal fade" id="editarCurso" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Curso</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="{{ url_for('atualizar_curso', curso_id=curso.id) }}" method="POST">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Nome do Curso</label>
+                            <input type="text" class="form-control" name="nome" value="{{ curso.nome }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descrição</label>
+                            <textarea class="form-control" name="descricao" rows="3">{{ curso.descricao }}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Carga Horária (horas)</label>
+                            <input type="number" class="form-control" name="carga_horaria" value="{{ curso.carga_horaria }}" min="1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Duração (meses)</label>
+                            <input type="number" class="form-control" name="duracao" value="{{ curso.duracao }}" min="1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Requisitos</label>
+                            <textarea class="form-control" name="requisitos" rows="2">{{ curso.requisitos }}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status" required>
+                                <option value="ativo" {% if curso.status == 'ativo' %}selected{% endif %}>Ativo</option>
+                                <option value="inativo" {% if curso.status == 'inativo' %}selected{% endif %}>Inativo</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Observações</label>
+                            <textarea class="form-control" name="observacoes" rows="2">{{ curso.observacoes }}</textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('editar') === '1') {
+            var modal = new bootstrap.Modal(document.getElementById('editarCurso'));
+            modal.show();
+        }
+    });
+</script>
+{% endblock %} 
