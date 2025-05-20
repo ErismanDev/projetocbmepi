@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3>Visualizar Certificado</h3>
+                <div>
+                    <a href="{{ url_for('certificados.download_certificado', certificado_id=certificado.id) }}" 
+                       class="btn btn-success">
+                        <i class="fas fa-download"></i> Download
+                    </a>
+                    <form action="{{ url_for('certificados.reenviar_certificado', certificado_id=certificado.id) }}" 
+                          method="POST" class="d-inline">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-paper-plane"></i> Reenviar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>Informações do Certificado</h4>
+                    <table class="table">
+                        <tr>
+                            <th>Código:</th>
+                            <td>{{ certificado.codigo }}</td>
+                        </tr>
+                        <tr>
+                            <th>Aluno:</th>
+                            <td>{{ certificado.aluno.nome }}</td>
+                        </tr>
+                        <tr>
+                            <th>Turma:</th>
+                            <td>{{ certificado.turma.nome }}</td>
+                        </tr>
+                        <tr>
+                            <th>Data de Emissão:</th>
+                            <td>{{ certificado.data_emissao.strftime('%d/%m/%Y') }}</td>
+                        </tr>
+                        <tr>
+                            <th>Data de Conclusão:</th>
+                            <td>{{ certificado.data_conclusao.strftime('%d/%m/%Y') }}</td>
+                        </tr>
+                        <tr>
+                            <th>Carga Horária:</th>
+                            <td>{{ certificado.carga_horaria }} horas</td>
+                        </tr>
+                        <tr>
+                            <th>Status:</th>
+                            <td>
+                                <span class="badge {% if certificado.status == 'emitido' %}bg-success{% elif certificado.status == 'cancelado' %}bg-danger{% else %}bg-warning{% endif %}">
+                                    {{ certificado.status }}
+                                </span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h4>Prévia do Certificado</h4>
+                    <div class="certificado-preview">
+                        <div class="certificado-content" style="
+                            background-image: url('{{ certificado.modelo.imagem_fundo }}');
+                            background-size: cover;
+                            background-position: center;
+                            min-height: 400px;
+                            padding: 20px;
+                            position: relative;
+                            border: 1px solid #ddd;
+                        ">
+                            <div style="
+                                font-family: {{ certificado.modelo.fonte }};
+                                font-size: {{ certificado.modelo.tamanho_fonte }}px;
+                                color: {{ certificado.modelo.cor_texto }};
+                                text-align: center;
+                                margin-top: 150px;
+                            ">
+                                {{ certificado.modelo.conteudo.format(
+                                    aluno=certificado.aluno.nome,
+                                    turma=certificado.turma.nome,
+                                    data=certificado.data_conclusao.strftime('%d/%m/%Y'),
+                                    carga_horaria=certificado.carga_horaria
+                                ) }}
+                            </div>
+                            <div style="position: absolute; bottom: 20px; right: 20px;">
+                                <img src="{{ url_for('static', filename='uploads/certificados/qr/qr_' + certificado.codigo + '.png') }}" 
+                                     alt="QR Code" style="width: 100px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

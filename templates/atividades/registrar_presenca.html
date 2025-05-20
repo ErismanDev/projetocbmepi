@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h3>Registro de Presenças - {{ turma.nome }}</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="data">Data</label>
+                            <input type="date" class="form-control" id="data" name="data" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Aluno</th>
+                                <th>Status</th>
+                                <th>Justificativa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for aluno in alunos %}
+                            <tr>
+                                <td>
+                                    {{ aluno.nome }}
+                                    <input type="hidden" name="alunos[]" value="{{ aluno.id }}">
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <input type="radio" class="btn-check" name="presencas[{{ aluno.id }}]" 
+                                               id="presente_{{ aluno.id }}" value="presente" checked>
+                                        <label class="btn btn-outline-success" for="presente_{{ aluno.id }}">
+                                            Presente
+                                        </label>
+
+                                        <input type="radio" class="btn-check" name="presencas[{{ aluno.id }}]" 
+                                               id="ausente_{{ aluno.id }}" value="ausente">
+                                        <label class="btn btn-outline-danger" for="ausente_{{ aluno.id }}">
+                                            Ausente
+                                        </label>
+
+                                        <input type="radio" class="btn-check" name="presencas[{{ aluno.id }}]" 
+                                               id="justificado_{{ aluno.id }}" value="justificado">
+                                        <label class="btn btn-outline-warning" for="justificado_{{ aluno.id }}">
+                                            Justificado
+                                        </label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="justificativa-container" style="display: none;">
+                                        <textarea class="form-control" name="justificativas[{{ aluno.id }}]" 
+                                                  rows="2" placeholder="Motivo da justificativa"></textarea>
+                                        <div class="mt-2">
+                                            <input type="file" class="form-control" name="arquivos[{{ aluno.id }}]" 
+                                                   accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">Salvar Presenças</button>
+                    <a href="{{ url_for('atividades.listar_presencas', turma_id=turma.id) }}" 
+                       class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const rows = document.querySelectorAll('tr');
+    
+    rows.forEach(row => {
+        const radios = row.querySelectorAll('input[type="radio"]');
+        const justificativaContainer = row.querySelector('.justificativa-container');
+        
+        radios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.value === 'justificado') {
+                    justificativaContainer.style.display = 'block';
+                } else {
+                    justificativaContainer.style.display = 'none';
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %} 

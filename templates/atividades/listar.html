@@ -1,102 +1,118 @@
-{% extends "base_dashboard.html" %}
+{% extends "base.html" %}
 
 {% block content %}
-<div class="container-fluid">
+<div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Atividades</h2>
-        {% if session.get('usuario_tipo') == 'admin' or session.get('usuario_tipo') == 'instrutor' %}
-        <a href="{{ url_for('nova_atividade') }}" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Nova Atividade
+        <a href="{{ url_for('atividades.nova_atividade') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nova Atividade
         </a>
-        {% endif %}
     </div>
 
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Título</th>
-                            {# <th>Turma</th> #}
-                            <th>Data</th>
-                            <th>Status</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for atividade in atividades %}
-                        <tr>
-                            <td>{{ atividade.titulo }}</td>
-                            {# <td>{{ atividade.turma.nome }}</td> #}
-                            <td>{{ atividade.data.strftime('%d/%m/%Y') }}</td>
-                            <td>
-                                {% if atividade.status == 'pendente' %}
-                                <span class="badge bg-warning">Pendente</span>
-                                {% elif atividade.status == 'concluida' %}
-                                <span class="badge bg-success">Concluída</span>
-                                {% else %}
-                                <span class="badge bg-danger">Cancelada</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <div class="btn-group">
-                                    <a href="{{ url_for('detalhes_atividade', atividade_id=atividade.id) }}" class="btn btn-sm btn-info">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                    {% if session.get('usuario_tipo') == 'admin' or session.get('usuario_tipo') == 'instrutor' %}
-                                    <a href="{{ url_for('atualizar_atividade', atividade_id=atividade.id) }}" class="btn btn-sm btn-warning">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <button type="button" class="btn btn-sm btn-danger" onclick="confirmarExclusao('{{ atividade.id }}')">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                    {% endif %}
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#lista" data-toggle="tab">Lista</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#calendario" data-toggle="tab">Calendário</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="lista">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Título</th>
+                                            <th>Data</th>
+                                            <th>Categoria</th>
+                                            <th>Status</th>
+                                            <th>Turma</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for atividade in atividades %}
+                                        <tr>
+                                            <td>{{ atividade.titulo }}</td>
+                                            <td>{{ atividade.data.strftime('%d/%m/%Y') }}</td>
+                                            <td>
+                                                {% if atividade.categoria %}
+                                                <span class="badge" style="background-color: {{ atividade.categoria.cor }}">
+                                                    {{ atividade.categoria.nome }}
+                                                </span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-{{ 'success' if atividade.status == 'concluida' else 'warning' if atividade.status == 'pendente' else 'danger' }}">
+                                                    {{ atividade.status }}
+                                                </span>
+                                            </td>
+                                            <td>{{ atividade.turma.nome }}</td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <a href="#" class="btn btn-sm btn-info" title="Detalhes">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="#" class="btn btn-sm btn-warning" title="Editar">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a href="#" class="btn btn-sm btn-danger" title="Excluir">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="calendario">
+                            <div id="calendar"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
-<!-- Modal de Confirmação de Exclusão -->
-<div class="modal fade" id="modalExclusao" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Confirmar Exclusão</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                Tem certeza que deseja excluir a atividade <strong id="atividadeTitulo"></strong>?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <form id="formExclusao" method="POST" style="display: inline;">
-                    <button type="submit" class="btn btn-danger">Excluir</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
 {% endblock %}
 
 {% block scripts %}
+<link href='https://cdn.jsdelivr.net/npm/@fullcalendar/core@4.4.0/main.min.css' rel='stylesheet' />
+<link href='https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@4.4.0/main.min.css' rel='stylesheet' />
+<script src='https://cdn.jsdelivr.net/npm/@fullcalendar/core@4.4.0/main.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@4.4.0/main.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@4.4.0/main.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/@fullcalendar/bootstrap@4.4.0/main.min.js'></script>
+
 <script>
-function confirmarExclusao(atividadeId) {
-    const modal = new bootstrap.Modal(document.getElementById('modalExclusao'));
-    const form = document.getElementById('formExclusao');
-    form.action = `/atividade/${atividadeId}/excluir`;
-    // Buscar o título da atividade na tabela
-    const row = document.querySelector(`button[onclick="confirmarExclusao('${atividadeId}')"]`).closest('tr');
-    const titulo = row.querySelector('td').textContent;
-    document.getElementById('atividadeTitulo').textContent = titulo;
-    modal.show();
-}
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        plugins: ['dayGrid', 'interaction', 'bootstrap'],
+        themeSystem: 'bootstrap',
+        header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,dayGridWeek'
+        },
+        defaultView: 'dayGridMonth',
+        locale: 'pt-br',
+        events: '/api/eventos',
+        eventClick: function(info) {
+            // Aqui você pode adicionar o código para mostrar os detalhes da atividade
+            alert('Atividade: ' + info.event.title + '\n\nDescrição: ' + info.event.extendedProps.descricao);
+        }
+    });
+    calendar.render();
+});
 </script>
 {% endblock %} 

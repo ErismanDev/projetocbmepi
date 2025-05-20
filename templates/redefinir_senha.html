@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}Redefinir Senha{% endblock %}
+
+{% block main_content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="card shadow p-4" style="max-width: 400px; width: 100%;">
+        <div class="text-center mb-4">
+            <span class="rounded-circle bg-white d-flex align-items-center justify-content-center mx-auto mb-3" style="width:80px; height:80px; overflow:hidden; border:3px solid #b71c1c;">
+                <img src="{{ url_for('static', filename='img/logo_cbmepi.png') }}" alt="Logo CBMEPI" style="width:70px; height:70px; object-fit:cover;">
+            </span>
+            <h2 class="mb-0" style="color:#b71c1c;">Nova Senha</h2>
+            <p class="text-muted mt-2">Digite sua nova senha</p>
+        </div>
+
+        <form method="POST" class="needs-validation" novalidate>
+            <div class="mb-3">
+                <label for="senha" class="form-label">Nova Senha</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                    <input type="password" class="form-control" id="senha" name="senha" required
+                           minlength="8" placeholder="Mínimo 8 caracteres">
+                    <button class="btn btn-outline-secondary" type="button" id="toggleSenha">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                    <div class="invalid-feedback">
+                        A senha deve ter no mínimo 8 caracteres.
+                    </div>
+                </div>
+                <div class="form-text">
+                    A senha deve conter no mínimo 8 caracteres, incluindo letras e números.
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label for="confirmar_senha" class="form-label">Confirmar Nova Senha</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                    <input type="password" class="form-control" id="confirmar_senha" name="confirmar_senha" required
+                           minlength="8" placeholder="Confirme sua senha">
+                    <button class="btn btn-outline-secondary" type="button" id="toggleConfirmarSenha">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                    <div class="invalid-feedback">
+                        As senhas não coincidem.
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-danger btn-lg">
+                    <i class="bi bi-check-circle me-2"></i>Redefinir Senha
+                </button>
+                <a href="{{ url_for('login') }}" class="btn btn-link text-danger">
+                    <i class="bi bi-arrow-left me-1"></i>Voltar para o login
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle senha
+    function setupPasswordToggle(inputId, toggleId) {
+        const input = document.getElementById(inputId);
+        const toggle = document.getElementById(toggleId);
+        
+        toggle.addEventListener('click', function() {
+            const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+            input.setAttribute('type', type);
+            this.querySelector('i').classList.toggle('bi-eye');
+            this.querySelector('i').classList.toggle('bi-eye-slash');
+        });
+    }
+
+    setupPasswordToggle('senha', 'toggleSenha');
+    setupPasswordToggle('confirmar_senha', 'toggleConfirmarSenha');
+
+    // Validação em tempo real
+    const senhaInput = document.getElementById('senha');
+    const confirmarSenhaInput = document.getElementById('confirmar_senha');
+
+    function validatePassword() {
+        const senha = senhaInput.value;
+        const confirmarSenha = confirmarSenhaInput.value;
+
+        // Validar senha
+        if (senha.length < 8) {
+            senhaInput.classList.add('is-invalid');
+            senhaInput.classList.remove('is-valid');
+        } else {
+            senhaInput.classList.add('is-valid');
+            senhaInput.classList.remove('is-invalid');
+        }
+
+        // Validar confirmação
+        if (senha !== confirmarSenha) {
+            confirmarSenhaInput.classList.add('is-invalid');
+            confirmarSenhaInput.classList.remove('is-valid');
+        } else {
+            confirmarSenhaInput.classList.add('is-valid');
+            confirmarSenhaInput.classList.remove('is-invalid');
+        }
+    }
+
+    senhaInput.addEventListener('input', validatePassword);
+    confirmarSenhaInput.addEventListener('input', validatePassword);
+
+    // Feedback visual durante o envio
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        if (!form.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+        } else {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Redefinindo...';
+        }
+        form.classList.add('was-validated');
+    });
+});
+</script>
+{% endblock %} 

@@ -46,7 +46,7 @@
                             {% if instrutor.foto %}
                     <img src="{{ url_for('static', filename=instrutor.foto) }}" alt="Foto do Instrutor" class="rounded-circle me-3" style="width: 48px; height: 48px; object-fit: cover;">
                             {% else %}
-                    <img src="{{ url_for('static', filename='img/default-avatar.png') }}" alt="Foto Padrão" class="rounded-circle me-3" style="width: 48px; height: 48px; object-fit: cover;">
+                    <img src="{{ url_for('static', filename='img/default_profile.svg') }}" alt="Foto Padrão" class="rounded-circle me-3" style="width: 48px; height: 48px; object-fit: cover;">
                             {% endif %}
                 <div>
                     <strong>{{ instrutor.nome }}</strong><br>

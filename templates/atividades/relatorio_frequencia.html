@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3>Relatório de Frequência - {{ turma.nome }}</h3>
+                <div>
+                    <button class="btn btn-success" onclick="exportarPDF()">
+                        <i class="fas fa-file-pdf"></i> Exportar PDF
+                    </button>
+                    <button class="btn btn-primary" onclick="exportarExcel()">
+                        <i class="fas fa-file-excel"></i> Exportar Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <canvas id="graficoFrequencia"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <canvas id="graficoStatus"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover" id="tabelaFrequencia">
+                    <thead>
+                        <tr>
+                            <th>Aluno</th>
+                            <th>Total de Aulas</th>
+                            <th>Presenças</th>
+                            <th>Faltas</th>
+                            <th>Justificadas</th>
+                            <th>Frequência (%)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stat in estatisticas %}
+                        <tr>
+                            <td>{{ stat.aluno.nome }}</td>
+                            <td>{{ stat.total_aulas }}</td>
+                            <td>{{ stat.presencas }}</td>
+                            <td>{{ stat.total_aulas - stat.presencas }}</td>
+                            <td>{{ stat.justificadas if stat.justificadas else 0 }}</td>
+                            <td>{{ "%.2f"|format(stat.frequencia) }}%</td>
+                            <td>
+                                <span class="badge {% if stat.frequencia >= 75 %}bg-success{% else %}bg-danger{% endif %}">
+                                    {{ "Regular" if stat.frequencia >= 75 else "Irregular" }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Dados para os gráficos
+    const dados = {
+        labels: [{% for stat in estatisticas %}'{{ stat.aluno.nome }}',{% endfor %}],
+        frequencias: [{% for stat in estatisticas %}{{ stat.frequencia }},{% endfor %}],
+        presencas: [{% for stat in estatisticas %}{{ stat.presencas }},{% endfor %}],
+        faltas: [{% for stat in estatisticas %}{{ stat.total_aulas - stat.presencas }},{% endfor %}],
+        justificadas: [{% for stat in estatisticas %}{{ stat.justificadas if stat.justificadas else 0 }},{% endfor %}]
+    };
+
+    // Gráfico de Frequência
+    const ctxFreq = document.getElementById('graficoFrequencia').getContext('2d');
+    new Chart(ctxFreq, {
+        type: 'bar',
+        data: {
+            labels: dados.labels,
+            datasets: [{
+                label: 'Frequência (%)',
+                data: dados.frequencias,
+                backgroundColor: dados.frequencias.map(f => f >= 75 ? '#28a745' : '#dc3545'),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Frequência por Aluno'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+
+    // Gráfico de Status
+    const ctxStatus = document.getElementById('graficoStatus').getContext('2d');
+    new Chart(ctxStatus, {
+        type: 'pie',
+        data: {
+            labels: ['Presenças', 'Faltas', 'Justificadas'],
+            datasets: [{
+                data: [
+                    dados.presencas.reduce((a, b) => a + b, 0),
+                    dados.faltas.reduce((a, b) => a + b, 0),
+                    dados.justificadas.reduce((a, b) => a + b, 0)
+                ],
+                backgroundColor: ['#28a745', '#dc3545', '#ffc107']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Distribuição de Presenças'
+                }
+            }
+        }
+    });
+});
+
+function exportarPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    doc.text('Relatório de Frequência - {{ turma.nome }}', 14, 15);
+    
+    const columns = ['Aluno', 'Freq. %', 'Status'];
+    const rows = [];
+    
+    {% for stat in estatisticas %}
+    rows.push([
+        '{{ stat.aluno.nome }}',
+        '{{ "%.2f"|format(stat.frequencia) }}%',
+        '{{ "Regular" if stat.frequencia >= 75 else "Irregular" }}'
+    ]);
+    {% endfor %}
+    
+    doc.autoTable({
+        head: [columns],
+        body: rows,
+        startY: 25
+    });
+    
+    doc.save('relatorio-frequencia-{{ turma.nome }}.pdf');
+}
+
+function exportarExcel() {
+    const rows = [['Aluno', 'Total Aulas', 'Presenças', 'Faltas', 'Justificadas', 'Frequência (%)', 'Status']];
+    
+    {% for stat in estatisticas %}
+    rows.push([
+        '{{ stat.aluno.nome }}',
+        {{ stat.total_aulas }},
+        {{ stat.presencas }},
+        {{ stat.total_aulas - stat.presencas }},
+        {{ stat.justificadas if stat.justificadas else 0 }},
+        {{ "%.2f"|format(stat.frequencia) }},
+        '{{ "Regular" if stat.frequencia >= 75 else "Irregular" }}'
+    ]);
+    {% endfor %}
+    
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Frequência');
+    XLSX.writeFile(wb, 'relatorio-frequencia-{{ turma.nome }}.xlsx');
+}
+</script>
+{% endblock %} 

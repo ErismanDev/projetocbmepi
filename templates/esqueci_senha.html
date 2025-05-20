@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Esqueci minha senha{% endblock %}
+
+{% block main_content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="card shadow p-4" style="max-width: 400px; width: 100%;">
+        <div class="text-center mb-4">
+            <span class="rounded-circle bg-white d-flex align-items-center justify-content-center mx-auto mb-3" style="width:80px; height:80px; overflow:hidden; border:3px solid #b71c1c;">
+                <img src="{{ url_for('static', filename='img/logo_cbmepi.png') }}" alt="Logo CBMEPI" style="width:70px; height:70px; object-fit:cover;">
+            </span>
+            <h2 class="mb-0" style="color:#b71c1c;">Recuperar Senha</h2>
+            <p class="text-muted mt-2">Digite seu e-mail para receber as instruções</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('esqueci_senha') }}" class="needs-validation" novalidate>
+            <div class="mb-4">
+                <label for="email" class="form-label">E-mail</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                    <input type="email" class="form-control" id="email" name="email" required
+                           placeholder="seu.email@exemplo.com">
+                    <div class="invalid-feedback">
+                        Por favor, insira um e-mail válido.
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-danger btn-lg">
+                    <i class="bi bi-send me-2"></i>Enviar Instruções
+                </button>
+                <a href="{{ url_for('login') }}" class="btn btn-link text-danger">
+                    <i class="bi bi-arrow-left me-1"></i>Voltar para o login
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Validação em tempo real do email
+    const emailInput = document.getElementById('email');
+    emailInput.addEventListener('input', function() {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (emailRegex.test(this.value)) {
+            this.classList.add('is-valid');
+            this.classList.remove('is-invalid');
+        } else {
+            this.classList.add('is-invalid');
+            this.classList.remove('is-valid');
+        }
+    });
+
+    // Feedback visual durante o envio
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function() {
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Enviando...';
+    });
+});
+</script>
+{% endblock %} 

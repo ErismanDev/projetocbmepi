@@ -1,4 +1,6 @@
-from app import app, db, Usuario, Aluno, Atividade, Participacao, Curso, Turma, generate_password_hash
+from app import app, db
+from models import Usuario, Aluno, Atividade, Participacao, Curso, Turma, Disciplina, Presenca, Avaliacao, Certificado
+from werkzeug.security import generate_password_hash
 from datetime import datetime, timedelta
 import os
 import json
@@ -53,29 +55,32 @@ if __name__ == '__main__':
     init_db()
 
 # Migração manual de campos extras
+def migrate_db():
+    db_path = 'bombeiro_mirim.db'
+    conn = sqlite3.connect(db_path)
+    c = conn.cursor()
 
-db_path = 'bombeiro_mirim.db'
+    # Adiciona o campo para alunos, se não existir
+    try:
+        c.execute("ALTER TABLE aluno ADD COLUMN documentos TEXT DEFAULT '[]'")
+        print("Campo 'documentos' adicionado na tabela 'aluno'.")
+    except Exception as e:
+        print("Campo 'documentos' já existe em 'aluno' ou erro:", e)
 
-conn = sqlite3.connect(db_path)
-c = conn.cursor()
+    # Adiciona o campo para instrutores/usuários, se não existir
+    try:
+        c.execute("ALTER TABLE usuario ADD COLUMN documentos TEXT DEFAULT '[]'")
+        print("Campo 'documentos' adicionado na tabela 'usuario'.")
+    except Exception as e:
+        print("Campo 'documentos' já existe em 'usuario' ou erro:", e)
 
-# Adiciona o campo para alunos, se não existir
-try:
-    c.execute("ALTER TABLE aluno ADD COLUMN documentos TEXT DEFAULT '[]'")
-    print("Campo 'documentos' adicionado na tabela 'aluno'.")
-except Exception as e:
-    print("Campo 'documentos' já existe em 'aluno' ou erro:", e)
+    conn.commit()
+    conn.close()
+    print("Migração concluída! Seu banco está pronto para os novos recursos de documentos.")
 
-# Adiciona o campo para instrutores/usuários, se não existir
-try:
-    c.execute("ALTER TABLE usuario ADD COLUMN documentos TEXT DEFAULT '[]'")
-    print("Campo 'documentos' adicionado na tabela 'usuario'.")
-except Exception as e:
-    print("Campo 'documentos' já existe em 'usuario' ou erro:", e)
-
-conn.commit()
-conn.close()
-print("Migração concluída! Seu banco está pronto para os novos recursos de documentos.")
+if __name__ == '__main__':
+    init_db()
+    migrate_db()
 
 conn = sqlite3.connect('bombeiro_mirim.db')
 c = conn.cursor()

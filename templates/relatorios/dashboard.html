@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Dashboard</h2>
+        <div>
+            <a href="{{ url_for('relatorios.listar_relatorios') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total de Alunos</h5>
+                    <h2 class="card-text">{{ total_alunos }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total de Turmas</h5>
+                    <h2 class="card-text">{{ total_turmas }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total de Atividades</h5>
+                    <h2 class="card-text">{{ total_atividades }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total de Certificados</h5>
+                    <h2 class="card-text">{{ total_certificados }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="row">
+        <!-- Frequência Média -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Frequência Média</h5>
+                    <div class="progress" style="height: 30px;">
+                        <div class="progress-bar {% if frequencia_media >= 75 %}bg-success{% elif frequencia_media >= 50 %}bg-warning{% else %}bg-danger{% endif %}"
+                             role="progressbar"
+                             style="width: {{ frequencia_media }}%"
+                             aria-valuenow="{{ frequencia_media }}"
+                             aria-valuemin="0"
+                             aria-valuemax="100">
+                            {{ "%.1f"|format(frequencia_media) }}%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Média Geral -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Média Geral</h5>
+                    <div class="progress" style="height: 30px;">
+                        <div class="progress-bar {% if media_geral >= 7 %}bg-success{% elif media_geral >= 5 %}bg-warning{% else %}bg-danger{% endif %}"
+                             role="progressbar"
+                             style="width: {{ (media_geral / 10) * 100 }}%"
+                             aria-valuenow="{{ media_geral }}"
+                             aria-valuemin="0"
+                             aria-valuemax="10">
+                            {{ "%.1f"|format(media_geral) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráfico de Turmas -->
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Distribuição por Turma</h5>
+                    <canvas id="grafico_turmas"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Dados para o gráfico
+    const dados = {
+        labels: {{ dados_turmas|map(attribute='nome')|list|tojson }},
+        datasets: [{
+            label: 'Alunos',
+            data: {{ dados_turmas|map(attribute='alunos')|list|tojson }},
+            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+        }, {
+            label: 'Atividades',
+            data: {{ dados_turmas|map(attribute='atividades')|list|tojson }},
+            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 1
+        }]
+    };
+
+    // Configuração do gráfico
+    const config = {
+        type: 'bar',
+        data: dados,
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    };
+
+    // Criar o gráfico
+    const ctx = document.getElementById('grafico_turmas').getContext('2d');
+    new Chart(ctx, config);
+</script>
+{% endblock %}
+{% endblock %} 

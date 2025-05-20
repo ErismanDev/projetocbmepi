@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Relatório de Desempenho</h2>
+        <div>
+            <a href="{{ url_for('relatorios.listar_relatorios') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-4">
+                    <label for="turma_id" class="form-label">Turma</label>
+                    <select name="turma_id" id="turma_id" class="form-select">
+                        <option value="">Todas as turmas</option>
+                        {% for turma in turmas %}
+                        <option value="{{ turma.id }}" {% if request.args.get('turma_id')|int == turma.id %}selected{% endif %}>
+                            {{ turma.nome }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-filter"></i> Filtrar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Exportar -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-end">
+                <a href="{{ url_for('relatorios.relatorio_desempenho', formato='pdf', **request.args) }}" class="btn btn-danger me-2">
+                    <i class="fas fa-file-pdf"></i> PDF
+                </a>
+                <a href="{{ url_for('relatorios.relatorio_desempenho', formato='excel', **request.args) }}" class="btn btn-success me-2">
+                    <i class="fas fa-file-excel"></i> Excel
+                </a>
+                <a href="{{ url_for('relatorios.relatorio_desempenho', formato='csv', **request.args) }}" class="btn btn-info">
+                    <i class="fas fa-file-csv"></i> CSV
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabela de Desempenho -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Aluno</th>
+                            <th>Média</th>
+                            <th>Frequência</th>
+                            <th>Total Avaliações</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for info in dados %}
+                        <tr>
+                            <td>{{ info.aluno }}</td>
+                            <td>
+                                <div class="progress">
+                                    <div class="progress-bar {% if info.media >= 7 %}bg-success{% elif info.media >= 5 %}bg-warning{% else %}bg-danger{% endif %}"
+                                         role="progressbar"
+                                         style="width: {{ (info.media / 10) * 100 }}%"
+                                         aria-valuenow="{{ info.media }}"
+                                         aria-valuemin="0"
+                                         aria-valuemax="10">
+                                        {{ "%.1f"|format(info.media) }}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="progress">
+                                    <div class="progress-bar {% if info.frequencia >= 75 %}bg-success{% elif info.frequencia >= 50 %}bg-warning{% else %}bg-danger{% endif %}"
+                                         role="progressbar"
+                                         style="width: {{ info.frequencia }}%"
+                                         aria-valuenow="{{ info.frequencia }}"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100">
+                                        {{ "%.1f"|format(info.frequencia) }}%
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ info.total_avaliacoes }}</td>
+                            <td>
+                                <span class="badge {% if info.status == 'Aprovado' %}bg-success{% else %}bg-danger{% endif %}">
+                                    {{ info.status }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

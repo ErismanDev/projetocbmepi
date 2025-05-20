@@ -1,103 +1,103 @@
-{% extends "base_dashboard.html" %}
+{% extends "base.html" %}
 
 {% block content %}
-<div class="container-fluid">
+<div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Certificados</h2>
-        {% if session.get('usuario_tipo') == 'admin' %}
-        <a href="{{ url_for('novo_certificado') }}" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Novo Certificado
-        </a>
-        {% endif %}
+        <div>
+            <a href="{{ url_for('certificados.novo_certificado') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Novo Certificado
+            </a>
+            <a href="{{ url_for('certificados.listar_modelos') }}" class="btn btn-secondary">
+                <i class="fas fa-file-alt"></i> Modelos
+            </a>
+        </div>
     </div>
 
-    <div class="card shadow-sm">
+    <div class="card">
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
                         <tr>
+                            <th>Código</th>
                             <th>Aluno</th>
-                            <th>Curso</th>
-                            <th>Data de Emissão</th>
+                            <th>Turma</th>
+                            <th>Data Emissão</th>
                             <th>Status</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for certificado in certificados %}
+                        {% for certificado in certificados.items %}
                         <tr>
+                            <td>{{ certificado.codigo }}</td>
                             <td>{{ certificado.aluno.nome }}</td>
-                            <td>{{ certificado.curso.nome }}</td>
+                            <td>{{ certificado.turma.nome }}</td>
                             <td>{{ certificado.data_emissao.strftime('%d/%m/%Y') }}</td>
                             <td>
-                                {% if certificado.status == 'emitido' %}
-                                <span class="badge bg-success">Emitido</span>
-                                {% elif certificado.status == 'pendente' %}
-                                <span class="badge bg-warning">Pendente</span>
-                                {% else %}
-                                <span class="badge bg-danger">Cancelado</span>
-                                {% endif %}
+                                <span class="badge {% if certificado.status == 'emitido' %}bg-success{% elif certificado.status == 'cancelado' %}bg-danger{% else %}bg-warning{% endif %}">
+                                    {{ certificado.status }}
+                                </span>
                             </td>
                             <td>
                                 <div class="btn-group">
-                                    <a href="{{ url_for('visualizar_certificado', certificado_id=certificado.id) }}" class="btn btn-sm btn-info">
-                                        <i class="bi bi-eye"></i>
+                                    <a href="{{ url_for('certificados.visualizar_certificado', certificado_id=certificado.id) }}" 
+                                       class="btn btn-sm btn-info" title="Visualizar">
+                                        <i class="fas fa-eye"></i>
                                     </a>
-                                    {% if certificado.status == 'emitido' %}
-                                    <a href="{{ url_for('baixar_certificado', certificado_id=certificado.id) }}" class="btn btn-sm btn-success">
-                                        <i class="bi bi-download"></i>
+                                    <a href="{{ url_for('certificados.download_certificado', certificado_id=certificado.id) }}" 
+                                       class="btn btn-sm btn-success" title="Download">
+                                        <i class="fas fa-download"></i>
                                     </a>
-                                    {% endif %}
-                                    {% if session.get('usuario_tipo') == 'admin' %}
-                                    <a href="{{ url_for('editar_certificado', certificado_id=certificado.id) }}" class="btn btn-sm btn-warning">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <button type="button" class="btn btn-sm btn-danger" onclick="confirmarExclusao('{{ certificado.id }}')">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                    {% endif %}
+                                    <form action="{{ url_for('certificados.reenviar_certificado', certificado_id=certificado.id) }}" 
+                                          method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-warning" title="Reenviar">
+                                            <i class="fas fa-paper-plane"></i>
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center">Nenhum certificado encontrado.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
+            <!-- Paginação -->
+            <nav aria-label="Navegação de página">
+                <ul class="pagination justify-content-center">
+                    {% if certificados.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('certificados.listar_certificados', page=certificados.prev_num) }}">Anterior</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+                    {% endif %}
+                    {% for p in certificados.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=2) %}
+                        {% if p %}
+                            {% if p == certificados.page %}
+                                <li class="page-item active"><span class="page-link">{{ p }}</span></li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link" href="{{ url_for('certificados.listar_certificados', page=p) }}">{{ p }}</a></li>
+                            {% endif %}
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link">…</span></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if certificados.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('certificados.listar_certificados', page=certificados.next_num) }}">Próxima</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link">Próxima</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
         </div>
     </div>
 </div>
-
-<!-- Modal de Confirmação de Exclusão -->
-<div class="modal fade" id="modalExclusao" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Confirmar Exclusão</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                Tem certeza que deseja excluir este certificado?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <form id="formExclusao" method="POST" style="display: inline;">
-                    <button type="submit" class="btn btn-danger">Excluir</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-{% endblock %}
-
-{% block scripts %}
-<script>
-function confirmarExclusao(certificadoId) {
-    const modal = new bootstrap.Modal(document.getElementById('modalExclusao'));
-    const form = document.getElementById('formExclusao');
-    form.action = `/certificados/${certificadoId}/excluir`;
-    modal.show();
-}
-</script>
 {% endblock %} 

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Importar Alunos</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="arquivo" class="form-label">Arquivo Excel (.xlsx)</label>
+                            <input type="file" class="form-control" id="arquivo" name="arquivo" accept=".xlsx" required>
+                            <div class="form-text">
+                                O arquivo deve conter as seguintes colunas:
+                                <ul>
+                                    <li>nome</li>
+                                    <li>email</li>
+                                    <li>cpf</li>
+                                    <li>rg</li>
+                                    <li>data_nascimento (formato: DD/MM/YYYY)</li>
+                                    <li>responsavel</li>
+                                    <li>contato</li>
+                                    <li>contato_emergencia</li>
+                                    <li>tipo_sanguineo (opcional)</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Importar</button>
+                            <a href="{{ url_for('listar_alunos') }}" class="btn btn-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5>Instruções</h5>
+                </div>
+                <div class="card-body">
+                    <ol>
+                        <li>Prepare um arquivo Excel (.xlsx) com as colunas listadas acima</li>
+                        <li>Certifique-se de que os dados estão formatados corretamente:
+                            <ul>
+                                <li>CPF: apenas números ou no formato XXX.XXX.XXX-XX</li>
+                                <li>Data de nascimento: no formato DD/MM/YYYY</li>
+                                <li>Telefones: apenas números ou no formato (XX) XXXXX-XXXX</li>
+                            </ul>
+                        </li>
+                        <li>Faça upload do arquivo usando o formulário acima</li>
+                        <li>O sistema irá:
+                            <ul>
+                                <li>Verificar duplicidade de CPF, email e RG</li>
+                                <li>Validar o formato dos dados</li>
+                                <li>Gerar senhas aleatórias para cada aluno</li>
+                                <li>Enviar emails com as credenciais de acesso</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

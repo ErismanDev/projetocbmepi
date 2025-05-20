@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Relatórios</h2>
+    
+    <div class="row">
+        <!-- Relatório de Frequência -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Relatório de Frequência</h5>
+                    <p class="card-text">Visualize a frequência dos alunos por turma e período.</p>
+                    <a href="{{ url_for('relatorios.relatorio_frequencia') }}" class="btn btn-primary">
+                        <i class="fas fa-calendar-check"></i> Acessar
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Relatório de Desempenho -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Relatório de Desempenho</h5>
+                    <p class="card-text">Acompanhe o desempenho dos alunos em avaliações e atividades.</p>
+                    <a href="{{ url_for('relatorios.relatorio_desempenho') }}" class="btn btn-primary">
+                        <i class="fas fa-chart-line"></i> Acessar
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Relatório de Atividades -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Relatório de Atividades</h5>
+                    <p class="card-text">Consulte as atividades realizadas por turma e período.</p>
+                    <a href="{{ url_for('relatorios.relatorio_atividades') }}" class="btn btn-primary">
+                        <i class="fas fa-tasks"></i> Acessar
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Relatório de Certificados -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Relatório de Certificados</h5>
+                    <p class="card-text">Visualize os certificados emitidos e seu status.</p>
+                    <a href="{{ url_for('relatorios.relatorio_certificados') }}" class="btn btn-primary">
+                        <i class="fas fa-certificate"></i> Acessar
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dashboard -->
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Dashboard</h5>
+                    <p class="card-text">Visualize indicadores gerais e gráficos do sistema.</p>
+                    <a href="{{ url_for('relatorios.dashboard') }}" class="btn btn-primary">
+                        <i class="fas fa-tachometer-alt"></i> Acessar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
