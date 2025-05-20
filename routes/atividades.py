@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for
 from flask_login import login_required, current_user
-from ..models import Atividade, Presenca, Aluno, Turma
-from ..extensions import db
+from models import Atividade, Presenca, Aluno, Turma
+from extensions import db
 from datetime import datetime
 import os
 from werkzeug.utils import secure_filename

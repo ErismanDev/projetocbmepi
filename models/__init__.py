@@ -4,7 +4,7 @@ import string
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
-from ..extensions import db
+from extensions import db
 import qrcode
 import json
 import hashlib
@@ -105,8 +105,6 @@ class Turma(db.Model):
     observacoes = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
-    # Relacionamentos
-    alunos = db.relationship('Aluno', secondary=aluno_turma, backref=db.backref('turmas', lazy='dynamic'))
     disciplinas = db.relationship('Disciplina', secondary=turma_disciplina, backref=db.backref('turmas', lazy='dynamic'))
     atividades = db.relationship('Atividade', backref='turma', lazy=True)
     aulas = db.relationship('Aula', backref='turma', lazy=True)

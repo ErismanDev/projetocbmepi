@@ -18,7 +18,8 @@ def init_db():
                 nome='Administrador',
                 email='admin@bombeiromirim.com',
                 senha_hash=generate_password_hash('admin123'),
-                tipo='admin'
+                tipo='admin',
+                status='ativo'
             )
             db.session.add(admin)
         else:
